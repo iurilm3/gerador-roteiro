@@ -30,7 +30,7 @@ export default function LandingPage() {
             </li>
             <li className="flex items-start gap-3">
               <span className="text-violet-400 mt-0.5 shrink-0">▸</span>
-              <p className="text-zinc-400 text-sm leading-relaxed">
+              <p className="text-zinc-50 text-lg font-semibold leading-snug">
                 Hooks para fazer sua audiência parar pra ver.
               </p>
             </li>
