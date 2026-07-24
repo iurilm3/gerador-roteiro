@@ -31,7 +31,7 @@ export default function LandingPage() {
             <li className="flex items-start gap-3">
               <span className="text-violet-400 mt-0.5 shrink-0">▸</span>
               <p className="text-zinc-400 text-sm leading-relaxed">
-                A única ferramenta que gera ganchos persuasivos, roteiros de Reels e carrosséis estratégicos alinhados à sua esteira de produtos em menos de 30 segundos.
+                Hooks para fazer sua audiência parar pra ver.
               </p>
             </li>
           </ul>
