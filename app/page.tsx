@@ -12,26 +12,32 @@ export default function LandingPage() {
       <main className="flex-1 flex flex-col justify-center px-6 py-16 w-full max-w-sm mx-auto">
         <div className="mb-10">
           <span className="inline-block bg-violet-950/60 text-violet-300 text-xs font-medium px-3 py-1.5 rounded-full border border-violet-800/40 mb-6">
-            Estratégia + Copy + Vendas
+            Estratégia + Copywriting + Vendas Diárias (Tudo Integrado)
           </span>
 
           <ul className="space-y-4 mb-2">
             <li className="flex items-start gap-3">
               <span className="text-violet-400 mt-0.5 shrink-0">▸</span>
               <p className="text-zinc-50 text-lg font-semibold leading-snug">
-                Transforme ideias rasas em Reels e Carrosséis que convertem.
+                Crie Reels e Carrosséis que não só engajam, mas{" "}
+                <span className="text-violet-400">vendem</span> — sem depender
+                de ferramentas de IA genéricas.
               </p>
             </li>
             <li className="flex items-start gap-3">
               <span className="text-violet-400 mt-0.5 shrink-0">▸</span>
               <p className="text-zinc-50 text-lg font-semibold leading-snug">
-                Roteiros infinitos com o seu estilo.
+                <span className="text-violet-400">Roteiros ilimitados</span>{" "}
+                que mantêm o seu tom de voz único — não parecem robôs.
               </p>
             </li>
             <li className="flex items-start gap-3">
               <span className="text-violet-400 mt-0.5 shrink-0">▸</span>
               <p className="text-zinc-50 text-lg font-semibold leading-snug">
-                Hooks para fazer sua audiência parar pra ver.
+                <span className="text-violet-400 font-bold">
+                  Hooks (ganchos) de alta retenção
+                </span>{" "}
+                e CTAs estratégicas para cada fase do seu funil.
               </p>
             </li>
           </ul>
@@ -41,7 +47,7 @@ export default function LandingPage() {
           href="/login"
           className="block w-full bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white font-semibold text-center py-4 rounded-xl transition-colors text-base"
         >
-          Entrar
+          Testar grátis: conteúdo que vende
         </Link>
 
         <p className="text-zinc-600 text-xs text-center mt-6">
