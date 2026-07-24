@@ -6,23 +6,23 @@ import { useRouter } from "next/navigation";
 const OBJETIVOS = [
   {
     id: "descoberta",
-    label: "Descoberta",
+    label: "+ Seguidores",
     descricao: "Alcançar pessoas novas",
   },
   {
     id: "relacionamento",
-    label: "Relacionamento",
-    descricao: "Aprofundar conexão com quem já te segue",
+    label: "+ Interação",
+    descricao: "Conexão com quem já te segue",
   },
   {
     id: "conversao",
-    label: "Conversão",
-    descricao: "Convidar para comprar",
+    label: "+ Vendas",
+    descricao: "$$$ no caixa",
   },
   {
     id: "remarketing",
-    label: "Remarketing",
-    descricao: "Falar com quem viu mas não comprou",
+    label: "+ Remarketing",
+    descricao: "Quem viu mas não comprou",
   },
 ];
 
@@ -52,7 +52,7 @@ export default function GerarPage() {
       {/* Objetivo */}
       <div className="mb-7">
         <p className="text-zinc-300 text-sm font-medium mb-3">
-          Objetivo do vídeo <span className="text-violet-500">*</span>
+          Escolha o que você quer que sua audiência faça hoje <span className="text-violet-500">*</span>
         </p>
         <div className="grid grid-cols-2 gap-3">
           {OBJETIVOS.map((obj) => {

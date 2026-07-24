@@ -12,16 +12,29 @@ export default function LandingPage() {
       <main className="flex-1 flex flex-col justify-center px-6 py-16 w-full max-w-sm mx-auto">
         <div className="mb-10">
           <span className="inline-block bg-violet-950/60 text-violet-300 text-xs font-medium px-3 py-1.5 rounded-full border border-violet-800/40 mb-6">
-            Para infoprodutoras
+            Estratégia + Copy + Vendas
           </span>
 
-          <h1 className="text-[2rem] font-bold text-zinc-50 leading-snug mb-4">
-            Seu roteiro de vídeo,<br />no seu tom,<br />em 30 segundos.
-          </h1>
-
-          <p className="text-zinc-400 text-base leading-relaxed">
-            Preencha seu perfil uma vez. Digite o tema do dia. Receba um roteiro pronto para gravar — sem hook engessado, sem clichê.
-          </p>
+          <ul className="space-y-4 mb-2">
+            <li className="flex items-start gap-3">
+              <span className="text-violet-400 mt-0.5 shrink-0">▸</span>
+              <p className="text-zinc-50 text-lg font-semibold leading-snug">
+                Transforme ideias rasas em Reels e Carrosséis que convertem.
+              </p>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-violet-400 mt-0.5 shrink-0">▸</span>
+              <p className="text-zinc-50 text-lg font-semibold leading-snug">
+                Roteiros infinitos com o seu estilo.
+              </p>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-violet-400 mt-0.5 shrink-0">▸</span>
+              <p className="text-zinc-400 text-sm leading-relaxed">
+                A única ferramenta que gera ganchos persuasivos, roteiros de Reels e carrosséis estratégicos alinhados à sua esteira de produtos em menos de 30 segundos.
+              </p>
+            </li>
+          </ul>
         </div>
 
         <Link
@@ -32,7 +45,7 @@ export default function LandingPage() {
         </Link>
 
         <p className="text-zinc-600 text-xs text-center mt-6">
-          Acesso por convite — grupo fechado
+          Teste grátis por 7 dias.
         </p>
       </main>
 
