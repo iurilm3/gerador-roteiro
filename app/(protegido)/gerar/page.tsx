@@ -2,44 +2,69 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 const OBJETIVOS = [
-  {
-    id: "descoberta",
-    label: "+ Seguidores",
-    descricao: "Alcançar pessoas novas",
-  },
-  {
-    id: "relacionamento",
-    label: "+ Interação",
-    descricao: "Conexão com quem já te segue",
-  },
-  {
-    id: "conversao",
-    label: "+ Vendas",
-    descricao: "$$$ no caixa",
-  },
-  {
-    id: "remarketing",
-    label: "+ Remarketing",
-    descricao: "Quem viu mas não comprou",
-  },
+  { id: "descoberta",     label: "+ Seguidores",  descricao: "Alcançar pessoas novas" },
+  { id: "relacionamento", label: "+ Interação",   descricao: "Conexão com quem já te segue" },
+  { id: "conversao",      label: "+ Vendas",      descricao: "$$$ no caixa" },
+  { id: "remarketing",    label: "+ Remarketing", descricao: "Quem viu mas não comprou" },
 ];
+
+// Roteiro de exemplo até a IA real entrar no Dia 9
+const ROTEIRO_EXEMPLO = `Eu precisava te contar uma coisa sobre culpa materna que muita gente não fala.
+
+Quando você grita, quando perde a paciência, quando passa o dia no automático — a culpa que vem depois não significa que você é uma mãe ruim. Significa que você se importa. Mãe que não liga não sente culpa.
+
+O problema não é sentir culpa. O problema é quando ela fica parada, só te punindo, sem virar nada. Aí ela drena ao invés de construir.
+
+O que eu aprendi depois de muito choro e muita conversa com Deus é isso: culpa que vira ação é graça. É o que separa a mãe que cresce da mãe que só sobrevive. Você não precisa ser perfeita. Precisa ser presente e honesta com você mesma.
+
+Se esse peso está pesado demais, o guia devocional Enquanto Eles Crescem tem um capítulo inteiro que me ajudou a transformar culpa em propósito. O link está na bio.
+
+Salva esse vídeo para quando você precisar lembrar que está fazendo melhor do que pensa.`;
 
 export default function GerarPage() {
   const [objetivo, setObjetivo] = useState("relacionamento");
-  const [topico, setTopico] = useState("culpa materna");
+  const [topico, setTopico] = useState("");
   const [gerando, setGerando] = useState(false);
+  const [erro, setErro] = useState("");
   const router = useRouter();
 
   const pode_gerar = objetivo !== "" && topico.trim() !== "";
 
-  function gerar() {
+  async function gerar() {
     if (!pode_gerar || gerando) return;
+    setErro("");
     setGerando(true);
-    setTimeout(() => {
-      router.push("/resultado");
-    }, 2000);
+
+    // Busca o perfil_id de quem está logado
+    const { data: perfil, error: erroPerfil } = await supabase
+      .from("perfil")
+      .select("id")
+      .single();
+
+    if (erroPerfil || !perfil) {
+      setErro("Não encontramos seu perfil. Preencha o perfil antes de gerar.");
+      setGerando(false);
+      return;
+    }
+
+    // Salva o roteiro no banco (roteiro de exemplo até o Dia 9)
+    const { error: erroRoteiro } = await supabase.from("roteiro").insert({
+      perfil_id: perfil.id,
+      objetivo,
+      topico,
+      roteiro_gerado: ROTEIRO_EXEMPLO,
+    });
+
+    if (erroRoteiro) {
+      setErro("Não foi possível salvar o roteiro. Verifique sua conexão e tente de novo.");
+      setGerando(false);
+      return;
+    }
+
+    router.push("/resultado");
   }
 
   return (
@@ -49,10 +74,17 @@ export default function GerarPage() {
         Escolha o objetivo e diga o tema. O roteiro chega em segundos.
       </p>
 
+      {erro && (
+        <div className="bg-red-950/40 border border-red-800/50 rounded-xl px-4 py-3 mb-6">
+          <p className="text-red-300 text-sm">{erro}</p>
+        </div>
+      )}
+
       {/* Objetivo */}
       <div className="mb-7">
         <p className="text-zinc-300 text-sm font-medium mb-3">
-          Escolha o que você quer que sua audiência faça hoje <span className="text-violet-500">*</span>
+          Escolha o que você quer que sua audiência faça hoje{" "}
+          <span className="text-violet-500">*</span>
         </p>
         <div className="grid grid-cols-2 gap-3">
           {OBJETIVOS.map((obj) => {
@@ -68,11 +100,7 @@ export default function GerarPage() {
                 }`}
                 style={{ minHeight: "80px" }}
               >
-                <p
-                  className={`font-semibold text-sm mb-1 ${
-                    ativo ? "text-violet-300" : "text-zinc-300"
-                  }`}
-                >
+                <p className={`font-semibold text-sm mb-1 ${ativo ? "text-violet-300" : "text-zinc-300"}`}>
                   {obj.label}
                 </p>
                 <p className="text-xs leading-relaxed text-zinc-500">

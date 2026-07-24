@@ -3,17 +3,58 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
+
+function traduzErro(mensagem: string): string {
+  if (mensagem.includes("Invalid login credentials"))
+    return "E-mail ou senha incorretos.";
+  if (mensagem.includes("User already registered"))
+    return "Este e-mail já tem uma conta. Clique em Entrar.";
+  if (mensagem.includes("Password should be at least"))
+    return "A senha precisa ter pelo menos 6 caracteres.";
+  if (mensagem.includes("Unable to validate email address"))
+    return "E-mail inválido. Verifique e tente de novo.";
+  if (mensagem.includes("Email not confirmed"))
+    return "Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.";
+  return "Algo deu errado. Tente novamente.";
+}
 
 export default function LoginPage() {
+  const [modo, setModo] = useState<"entrar" | "cadastro">("entrar");
   const [email, setEmail] = useState("");
-  const [clicado, setClicado] = useState(false);
+  const [senha, setSenha] = useState("");
+  const [carregando, setCarregando] = useState(false);
+  const [erro, setErro] = useState("");
+  const [confirmacao, setConfirmacao] = useState("");
   const router = useRouter();
 
-  function handleEntrar() {
-    setClicado(true);
-    setTimeout(() => {
-      router.push("/perfil");
-    }, 1500);
+  async function handleSubmit() {
+    setErro("");
+    setConfirmacao("");
+    if (!email || !senha) {
+      setErro("Preencha o e-mail e a senha.");
+      return;
+    }
+    setCarregando(true);
+
+    if (modo === "entrar") {
+      const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
+      if (error) {
+        setErro(traduzErro(error.message));
+      } else {
+        router.push("/perfil");
+      }
+    } else {
+      const { error } = await supabase.auth.signUp({ email, password: senha });
+      if (error) {
+        setErro(traduzErro(error.message));
+      } else {
+        setConfirmacao(
+          "Conta criada! Verifique seu e-mail para confirmar antes de entrar."
+        );
+      }
+    }
+    setCarregando(false);
   }
 
   return (
@@ -28,48 +69,87 @@ export default function LoginPage() {
       </header>
 
       <main className="flex-1 flex flex-col justify-center px-6 py-16 w-full max-w-sm mx-auto">
-        {/* Aviso de protótipo */}
-        <div className="bg-amber-950/40 border border-amber-800/40 rounded-xl px-4 py-3 mb-8">
-          <p className="text-amber-300 text-sm">
-            <span className="font-semibold">Dia 5 →</span> Login real com
-            e-mail entra no Dia 5. Por hoje, clique em Entrar para explorar o
-            protótipo.
-          </p>
-        </div>
-
-        <h1 className="text-2xl font-bold text-zinc-50 mb-2">Entrar</h1>
+        <h1 className="text-2xl font-bold text-zinc-50 mb-2">
+          {modo === "entrar" ? "Entrar" : "Criar conta"}
+        </h1>
         <p className="text-zinc-400 text-sm mb-8">
-          Digite seu e-mail e enviaremos um link de acesso direto — sem senha.
+          {modo === "entrar"
+            ? "Acesse com seu e-mail e senha."
+            : "Preencha os dados para criar sua conta."}
         </p>
 
-        <div className="mb-4">
-          <label className="block text-zinc-400 text-sm font-medium mb-2">
-            E-mail
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="seu@email.com"
-            className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 text-zinc-50 placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-base"
-            style={{ minHeight: "44px" }}
-          />
+        {/* Mensagem de erro */}
+        {erro && (
+          <div className="bg-red-950/40 border border-red-800/50 rounded-xl px-4 py-3 mb-5">
+            <p className="text-red-300 text-sm">{erro}</p>
+          </div>
+        )}
+
+        {/* Mensagem de confirmação */}
+        {confirmacao && (
+          <div className="bg-emerald-950/40 border border-emerald-800/50 rounded-xl px-4 py-3 mb-5">
+            <p className="text-emerald-300 text-sm">{confirmacao}</p>
+          </div>
+        )}
+
+        <div className="space-y-4 mb-6">
+          <div>
+            <label className="block text-zinc-400 text-sm font-medium mb-1.5">
+              E-mail
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="seu@email.com"
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 text-zinc-50 placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-base"
+              style={{ minHeight: "44px" }}
+            />
+          </div>
+
+          <div>
+            <label className="block text-zinc-400 text-sm font-medium mb-1.5">
+              Senha
+            </label>
+            <input
+              type="password"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              placeholder="Mínimo 6 caracteres"
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 text-zinc-50 placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-base"
+              style={{ minHeight: "44px" }}
+            />
+          </div>
         </div>
 
         <button
-          onClick={handleEntrar}
-          disabled={clicado}
-          className="w-full bg-violet-600 hover:bg-violet-500 active:bg-violet-700 disabled:opacity-60 text-white font-semibold py-4 rounded-xl transition-colors text-base mt-2"
+          onClick={handleSubmit}
+          disabled={carregando}
+          className="w-full bg-violet-600 hover:bg-violet-500 active:bg-violet-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-4 rounded-xl transition-colors text-base"
+          style={{ minHeight: "48px" }}
         >
-          {clicado ? "Acessando..." : "Receber link de acesso"}
+          {carregando
+            ? modo === "entrar"
+              ? "Entrando..."
+              : "Criando conta..."
+            : modo === "entrar"
+            ? "Entrar"
+            : "Criar conta"}
         </button>
 
-        <Link
-          href="/"
-          className="block text-center text-zinc-500 text-sm mt-6 hover:text-zinc-400 transition-colors"
-        >
-          ← Voltar
-        </Link>
+        <p className="text-zinc-500 text-sm text-center mt-6">
+          {modo === "entrar" ? "Não tem conta?" : "Já tem conta?"}{" "}
+          <button
+            onClick={() => {
+              setModo(modo === "entrar" ? "cadastro" : "entrar");
+              setErro("");
+              setConfirmacao("");
+            }}
+            className="text-violet-400 hover:text-violet-300 transition-colors"
+          >
+            {modo === "entrar" ? "Criar conta" : "Entrar"}
+          </button>
+        </p>
       </main>
     </div>
   );
