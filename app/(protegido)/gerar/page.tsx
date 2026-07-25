@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 const OBJETIVOS = [
@@ -42,23 +43,56 @@ export default function GerarPage() {
   const [topico, setTopico] = useState("");
   const [gerando, setGerando] = useState(false);
   const [erro, setErro] = useState("");
+  const [erroPerfil, setErroPerfil] = useState(false);
   const router = useRouter();
 
   const pode_gerar = objetivo !== "" && tipo_trafego !== "" && formato !== "" && topico.trim() !== "";
 
   async function gerar() {
-    if (!pode_gerar || gerando) return;
+    if (gerando) return;
     setErro("");
+
+    // Validação explícita campo a campo — recusa antes de tentar salvar
+    if (!objetivo) {
+      setErro("Escolha um objetivo antes de continuar.");
+      return;
+    }
+    if (!tipo_trafego) {
+      setErro("Escolha se o tráfego é orgânico ou pago antes de continuar.");
+      return;
+    }
+    if (!formato) {
+      setErro("Escolha o formato de entrega antes de continuar.");
+      return;
+    }
+    if (!topico.trim()) {
+      setErro("Escreva o tema do roteiro antes de continuar.");
+      return;
+    }
+
     setGerando(true);
 
     // Busca o perfil_id de quem está logado
     const { data: perfil, error: erroPerfil } = await supabase
       .from("perfil")
-      .select("id")
+      .select("id, nicho")
       .single();
 
-    if (erroPerfil || !perfil) {
-      setErro("Não encontramos seu perfil. Preencha o perfil antes de gerar.");
+    if (erroPerfil) {
+      // PGRST116 = nenhuma linha encontrada = perfil nunca foi preenchido
+      if (erroPerfil.code === "PGRST116") {
+        setErro("Você ainda não preencheu seu perfil. Preencha o perfil antes de gerar o primeiro roteiro.");
+        setErroPerfil(true);
+      } else {
+        setErro("Não conseguimos verificar seu perfil. Verifique sua conexão e tente de novo.");
+      }
+      setGerando(false);
+      return;
+    }
+
+    if (!perfil) {
+      setErro("Você ainda não preencheu seu perfil. Preencha o perfil antes de gerar o primeiro roteiro.");
+      setErroPerfil(true);
       setGerando(false);
       return;
     }
@@ -91,7 +125,15 @@ export default function GerarPage() {
 
       {erro && (
         <div className="bg-red-950/40 border border-red-800/50 rounded-xl px-4 py-3 mb-6">
-          <p className="text-red-300 text-sm">{erro}</p>
+          <p className="text-red-300 text-sm mb-2">{erro}</p>
+          {erroPerfil && (
+            <Link
+              href="/perfil"
+              className="inline-block text-xs font-semibold text-violet-400 hover:text-violet-300 transition-colors underline underline-offset-2"
+            >
+              Preencher perfil agora →
+            </Link>
+          )}
         </div>
       )}
 

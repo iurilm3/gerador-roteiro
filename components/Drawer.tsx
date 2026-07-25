@@ -42,6 +42,7 @@ export default function Drawer({ email, fechar }: Props) {
   const router = useRouter();
   const [roteiros, setRoteiros] = useState<Roteiro[]>([]);
   const [carregando, setCarregando] = useState(true);
+  const [erroDrawer, setErroDrawer] = useState(false);
   const [busca, setBusca] = useState("");
   const [secaoAberta, setSecaoAberta] = useState<Record<string, boolean>>({
     descoberta: false,
@@ -73,21 +74,29 @@ export default function Drawer({ email, fechar }: Props) {
 
   // Busca roteiros ao abrir e abre a seção do mais recente
   useEffect(() => {
-    async function buscarRoteiros() {
-      const { data } = await supabase
-        .from("roteiro")
-        .select("id, objetivo, topico, status, criado_em")
-        .order("criado_em", { ascending: false });
-      const lista = data ?? [];
-      setRoteiros(lista);
-      // Abre automaticamente a seção do roteiro mais recente
-      if (lista.length > 0) {
-        setSecaoAberta((prev) => ({ ...prev, [lista[0].objetivo]: true }));
-      }
-      setCarregando(false);
-    }
     buscarRoteiros();
   }, []);
+
+  async function buscarRoteiros() {
+    setCarregando(true);
+    setErroDrawer(false);
+    const { data, error } = await supabase
+      .from("roteiro")
+      .select("id, objetivo, topico, status, criado_em")
+      .order("criado_em", { ascending: false });
+    if (error) {
+      setErroDrawer(true);
+      setCarregando(false);
+      return;
+    }
+    const lista = data ?? [];
+    setRoteiros(lista);
+    // Abre automaticamente a seção do roteiro mais recente
+    if (lista.length > 0) {
+      setSecaoAberta((prev) => ({ ...prev, [lista[0].objetivo]: true }));
+    }
+    setCarregando(false);
+  }
 
   const termoBusca = normalizar(busca);
 
@@ -155,6 +164,18 @@ export default function Drawer({ email, fechar }: Props) {
             <p className="text-zinc-500 text-sm text-center py-10">
               Carregando roteiros...
             </p>
+          ) : erroDrawer ? (
+            <div className="text-center py-10 px-4">
+              <p className="text-red-300 text-sm mb-3">
+                Não conseguimos carregar seus roteiros.
+              </p>
+              <button
+                onClick={buscarRoteiros}
+                className="text-xs text-violet-400 hover:text-violet-300 transition-colors underline underline-offset-2"
+              >
+                Tentar de novo
+              </button>
+            </div>
           ) : roteiros.length === 0 ? (
             <div className="text-center py-10 px-4">
               <p className="text-zinc-400 text-sm mb-1">Nenhum roteiro ainda.</p>
