@@ -44,10 +44,10 @@ export default function Drawer({ email, fechar }: Props) {
   const [carregando, setCarregando] = useState(true);
   const [busca, setBusca] = useState("");
   const [secaoAberta, setSecaoAberta] = useState<Record<string, boolean>>({
-    descoberta: true,
-    relacionamento: true,
-    conversao: true,
-    remarketing: true,
+    descoberta: false,
+    relacionamento: false,
+    conversao: false,
+    remarketing: false,
   });
   const drawerRef = useRef<HTMLDivElement>(null);
 
@@ -71,14 +71,19 @@ export default function Drawer({ email, fechar }: Props) {
     return () => document.removeEventListener("keydown", handleKey);
   }, [fechar]);
 
-  // Busca roteiros ao abrir
+  // Busca roteiros ao abrir e abre a seção do mais recente
   useEffect(() => {
     async function buscarRoteiros() {
       const { data } = await supabase
         .from("roteiro")
         .select("id, objetivo, topico, status, criado_em")
         .order("criado_em", { ascending: false });
-      setRoteiros(data ?? []);
+      const lista = data ?? [];
+      setRoteiros(lista);
+      // Abre automaticamente a seção do roteiro mais recente
+      if (lista.length > 0) {
+        setSecaoAberta((prev) => ({ ...prev, [lista[0].objetivo]: true }));
+      }
       setCarregando(false);
     }
     buscarRoteiros();
