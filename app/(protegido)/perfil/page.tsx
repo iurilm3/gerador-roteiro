@@ -43,7 +43,6 @@ export default function PerfilPage() {
 
   const tudo_preenchido = OBRIGATORIOS.every((k) => dados[k].trim() !== "");
 
-  // Carrega perfil existente ao abrir a tela
   useEffect(() => {
     async function carregar() {
       const { data: sessionData } = await supabase.auth.getSession();
@@ -66,7 +65,6 @@ export default function PerfilPage() {
           cta_principal: data.cta_principal ?? "",
         });
       }
-      // error code PGRST116 = nenhuma linha encontrada (perfil novo) — não é erro real
       if (error && error.code !== "PGRST116") {
         setErro("Não conseguimos carregar seu perfil. Tente recarregar a página.");
       }
@@ -84,19 +82,10 @@ export default function PerfilPage() {
     let erro_supabase = null;
 
     if (perfilId) {
-      // Perfil já existe — atualiza
-      const { error } = await supabase
-        .from("perfil")
-        .update(dados)
-        .eq("id", perfilId);
+      const { error } = await supabase.from("perfil").update(dados).eq("id", perfilId);
       erro_supabase = error;
     } else {
-      // Perfil novo — cria
-      const { data, error } = await supabase
-        .from("perfil")
-        .insert(dados)
-        .select("id")
-        .single();
+      const { data, error } = await supabase.from("perfil").insert(dados).select("id").single();
       erro_supabase = error;
       if (data) setPerfilId(data.id);
     }
@@ -105,9 +94,7 @@ export default function PerfilPage() {
       setErro("Não foi possível salvar. Verifique sua conexão e tente de novo.");
     } else {
       setSucesso(true);
-      setTimeout(() => {
-        router.push("/gerar");
-      }, 800);
+      setTimeout(() => router.push("/gerar"), 800);
     }
     setSalvando(false);
   }
@@ -115,95 +102,59 @@ export default function PerfilPage() {
   if (carregando) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-zinc-500 text-sm">Carregando seu perfil...</p>
+        <p className="text-zinc-400 dark:text-zinc-500 text-sm">Carregando seu perfil...</p>
       </div>
     );
   }
 
   return (
     <div className="pb-8">
-      <h1 className="text-2xl font-bold text-zinc-50 mb-1">Seu perfil</h1>
-      <p className="text-zinc-400 text-sm mb-8 leading-relaxed">
+      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 mb-1">Seu perfil</h1>
+      <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-8 leading-relaxed">
         Preencha uma vez. O roteiro vai nascer daqui — cada campo vai direto
         para a IA.
       </p>
 
       {erro && (
-        <div className="bg-red-950/40 border border-red-800/50 rounded-xl px-4 py-3 mb-6">
-          <p className="text-red-300 text-sm">{erro}</p>
+        <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/50 rounded-xl px-4 py-3 mb-6">
+          <p className="text-red-700 dark:text-red-300 text-sm">{erro}</p>
         </div>
       )}
 
       {sucesso && (
-        <div className="bg-emerald-950/40 border border-emerald-800/50 rounded-xl px-4 py-3 mb-6">
-          <p className="text-emerald-300 text-sm">Perfil salvo! Indo para a geração...</p>
+        <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 rounded-xl px-4 py-3 mb-6">
+          <p className="text-emerald-700 dark:text-emerald-300 text-sm">Perfil salvo! Indo para a geração...</p>
         </div>
       )}
 
       <div className="space-y-5">
-        <Campo
-          label="Nome ou marca"
-          dica="opcional"
-          placeholder="Ex: Jhonielly Oliveira"
-          value={dados.nome_ou_marca}
-          onChange={(v) => setDados((p) => ({ ...p, nome_ou_marca: v }))}
-        />
-        <Campo
-          label="Nicho"
-          placeholder="Ex: maternidade cristã"
-          value={dados.nicho}
-          onChange={(v) => setDados((p) => ({ ...p, nicho: v }))}
-          obrigatorio
-        />
-        <Campo
-          label="Para quem você fala"
-          placeholder="Ex: mães cristãs com filhos pequenos"
-          value={dados.publico}
-          onChange={(v) => setDados((p) => ({ ...p, publico: v }))}
-          obrigatorio
-        />
-        <Campo
-          label="Seu produto principal"
-          placeholder="Ex: guia devocional Enquanto Eles Crescem"
-          value={dados.produto}
-          onChange={(v) => setDados((p) => ({ ...p, produto: v }))}
-          obrigatorio
-        />
-        <Campo
-          label="Seu tom de voz"
-          placeholder="Ex: acolhedor, direto, sem academicismo"
-          value={dados.tom_de_voz}
-          onChange={(v) => setDados((p) => ({ ...p, tom_de_voz: v }))}
-          obrigatorio
-        />
-        <Campo
-          label="Como você prefere falar"
-          placeholder="Ex: gosto de fala direta, sem hook engessado, sem trend"
-          value={dados.preferencias_estilo}
-          onChange={(v) => setDados((p) => ({ ...p, preferencias_estilo: v }))}
-          linhas={3}
-          obrigatorio
-        />
-        <Campo
-          label="CTA principal"
-          dica="opcional"
-          placeholder="Ex: salva esse vídeo para quando você precisar"
-          value={dados.cta_principal}
-          onChange={(v) => setDados((p) => ({ ...p, cta_principal: v }))}
-        />
+        <Campo label="Nome ou marca" dica="opcional" placeholder="Ex: Jhonielly Oliveira"
+          value={dados.nome_ou_marca} onChange={(v) => setDados((p) => ({ ...p, nome_ou_marca: v }))} />
+        <Campo label="Nicho" placeholder="Ex: maternidade cristã"
+          value={dados.nicho} onChange={(v) => setDados((p) => ({ ...p, nicho: v }))} obrigatorio />
+        <Campo label="Para quem você fala" placeholder="Ex: mães cristãs com filhos pequenos"
+          value={dados.publico} onChange={(v) => setDados((p) => ({ ...p, publico: v }))} obrigatorio />
+        <Campo label="Seu produto principal" placeholder="Ex: guia devocional Enquanto Eles Crescem"
+          value={dados.produto} onChange={(v) => setDados((p) => ({ ...p, produto: v }))} obrigatorio />
+        <Campo label="Seu tom de voz" placeholder="Ex: acolhedor, direto, sem academicismo"
+          value={dados.tom_de_voz} onChange={(v) => setDados((p) => ({ ...p, tom_de_voz: v }))} obrigatorio />
+        <Campo label="Como você prefere falar" placeholder="Ex: gosto de fala direta, sem hook engessado, sem trend"
+          value={dados.preferencias_estilo} onChange={(v) => setDados((p) => ({ ...p, preferencias_estilo: v }))} linhas={3} obrigatorio />
+        <Campo label="CTA principal" dica="opcional" placeholder="Ex: salva esse vídeo para quando você precisar"
+          value={dados.cta_principal} onChange={(v) => setDados((p) => ({ ...p, cta_principal: v }))} />
       </div>
 
       <button
         onClick={salvar}
         disabled={!tudo_preenchido || salvando}
-        className="w-full mt-8 bg-violet-600 hover:bg-violet-500 active:bg-violet-700 disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed text-white font-semibold py-4 rounded-xl transition-colors text-base"
+        className="w-full mt-8 bg-violet-600 hover:bg-violet-500 active:bg-violet-700 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 dark:disabled:text-zinc-600 disabled:cursor-not-allowed text-white font-semibold py-4 rounded-xl transition-colors text-base"
         style={{ minHeight: "48px" }}
       >
         {salvando ? "Salvando..." : "Salvar e continuar →"}
       </button>
 
       {!tudo_preenchido && !salvando && (
-        <p className="text-zinc-500 text-xs text-center mt-3">
+        <p className="text-zinc-400 dark:text-zinc-500 text-xs text-center mt-3">
           Preencha os campos obrigatórios (*) para continuar.
         </p>
       )}
@@ -212,49 +163,27 @@ export default function PerfilPage() {
 }
 
 function Campo({
-  label,
-  placeholder,
-  value,
-  onChange,
-  obrigatorio = false,
-  dica,
-  linhas = 1,
+  label, placeholder, value, onChange, obrigatorio = false, dica, linhas = 1,
 }: {
-  label: string;
-  placeholder: string;
-  value: string;
-  onChange: (v: string) => void;
-  obrigatorio?: boolean;
-  dica?: string;
-  linhas?: number;
+  label: string; placeholder: string; value: string;
+  onChange: (v: string) => void; obrigatorio?: boolean; dica?: string; linhas?: number;
 }) {
   const base =
-    "w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 text-zinc-50 placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-base";
+    "w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-xl px-4 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-base";
 
   return (
     <div>
       <div className="flex items-center gap-2 mb-1.5">
-        <label className="text-zinc-300 text-sm font-medium">{label}</label>
+        <label className="text-zinc-700 dark:text-zinc-300 text-sm font-medium">{label}</label>
         {obrigatorio && <span className="text-violet-500 text-xs">*</span>}
-        {dica && <span className="text-zinc-600 text-xs">{dica}</span>}
+        {dica && <span className="text-zinc-400 dark:text-zinc-600 text-xs">{dica}</span>}
       </div>
       {linhas > 1 ? (
-        <textarea
-          rows={linhas}
-          placeholder={placeholder}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={`${base} py-3 resize-none`}
-        />
+        <textarea rows={linhas} placeholder={placeholder} value={value}
+          onChange={(e) => onChange(e.target.value)} className={`${base} py-3 resize-none`} />
       ) : (
-        <input
-          type="text"
-          placeholder={placeholder}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={base}
-          style={{ minHeight: "44px" }}
-        />
+        <input type="text" placeholder={placeholder} value={value}
+          onChange={(e) => onChange(e.target.value)} className={base} style={{ minHeight: "44px" }} />
       )}
     </div>
   );

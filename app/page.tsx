@@ -2,39 +2,39 @@ import Link from "next/link";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-950">
-      <header className="px-6 py-5 border-b border-zinc-800/60">
-        <span className="text-violet-400 font-semibold text-sm tracking-widest uppercase">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-zinc-950">
+      <header className="px-6 py-5 border-b border-zinc-200/60 dark:border-zinc-800/60">
+        <span className="text-violet-600 dark:text-violet-400 font-semibold text-sm tracking-widest uppercase">
           Rotex Master Ads
         </span>
       </header>
 
       <main className="flex-1 flex flex-col justify-center px-6 py-16 w-full max-w-sm mx-auto">
         <div className="mb-10">
-          <span className="inline-block bg-violet-950/60 text-violet-300 text-xs font-medium px-3 py-1.5 rounded-full border border-violet-800/40 mb-6">
+          <span className="inline-block bg-violet-100 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 text-xs font-medium px-3 py-1.5 rounded-full border border-violet-200 dark:border-violet-800/40 mb-6">
             Estratégia + Copywriting + Vendas Diárias (Tudo Integrado)
           </span>
 
           <ul className="space-y-4 mb-2">
             <li className="flex items-start gap-3">
-              <span className="text-violet-400 mt-0.5 shrink-0">▸</span>
-              <p className="text-zinc-50 text-lg font-semibold leading-snug">
+              <span className="text-violet-500 dark:text-violet-400 mt-0.5 shrink-0">▸</span>
+              <p className="text-zinc-900 dark:text-zinc-50 text-lg font-semibold leading-snug">
                 Crie Reels e Carrosséis que não só engajam, mas{" "}
-                <span className="text-violet-400">vendem</span> — sem depender
+                <span className="text-violet-600 dark:text-violet-400">vendem</span> — sem depender
                 de ferramentas de IA genéricas.
               </p>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-violet-400 mt-0.5 shrink-0">▸</span>
-              <p className="text-zinc-50 text-lg font-semibold leading-snug">
-                <span className="text-violet-400">Roteiros ilimitados</span>{" "}
+              <span className="text-violet-500 dark:text-violet-400 mt-0.5 shrink-0">▸</span>
+              <p className="text-zinc-900 dark:text-zinc-50 text-lg font-semibold leading-snug">
+                <span className="text-violet-600 dark:text-violet-400">Roteiros ilimitados</span>{" "}
                 que mantêm o seu tom de voz único — não parecem robôs.
               </p>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-violet-400 mt-0.5 shrink-0">▸</span>
-              <p className="text-zinc-50 text-lg font-semibold leading-snug">
-                <span className="text-violet-400 font-bold">
+              <span className="text-violet-500 dark:text-violet-400 mt-0.5 shrink-0">▸</span>
+              <p className="text-zinc-900 dark:text-zinc-50 text-lg font-semibold leading-snug">
+                <span className="text-violet-600 dark:text-violet-400 font-bold">
                   Hooks (ganchos) de alta retenção
                 </span>{" "}
                 e CTAs estratégicas para cada fase do seu funil.
@@ -50,13 +50,13 @@ export default function LandingPage() {
           Testar grátis: conteúdo que vende
         </Link>
 
-        <p className="text-zinc-600 text-xs text-center mt-6">
+        <p className="text-zinc-400 dark:text-zinc-600 text-xs text-center mt-6">
           Teste grátis por 7 dias.
         </p>
       </main>
 
       <footer className="px-6 py-4 text-center">
-        <p className="text-zinc-700 text-xs">Rotex Master Ads · Protótipo</p>
+        <p className="text-zinc-400 dark:text-zinc-700 text-xs">Rotex Master Ads · Protótipo</p>
       </footer>
     </div>
   );

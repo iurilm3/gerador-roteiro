@@ -58,43 +58,41 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-950">
-      <header className="px-6 py-5 border-b border-zinc-800/60">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-zinc-950">
+      <header className="px-6 py-5 border-b border-zinc-200/60 dark:border-zinc-800/60">
         <Link
           href="/"
-          className="text-violet-400 font-semibold text-sm tracking-widest uppercase"
+          className="text-violet-600 dark:text-violet-400 font-semibold text-sm tracking-widest uppercase"
         >
           Rotex Master Ads
         </Link>
       </header>
 
       <main className="flex-1 flex flex-col justify-center px-6 py-16 w-full max-w-sm mx-auto">
-        <h1 className="text-2xl font-bold text-zinc-50 mb-2">
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 mb-2">
           {modo === "entrar" ? "Entrar" : "Criar conta"}
         </h1>
-        <p className="text-zinc-400 text-sm mb-8">
+        <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-8">
           {modo === "entrar"
             ? "Acesse com seu e-mail e senha."
             : "Preencha os dados para criar sua conta."}
         </p>
 
-        {/* Mensagem de erro */}
         {erro && (
-          <div className="bg-red-950/40 border border-red-800/50 rounded-xl px-4 py-3 mb-5">
-            <p className="text-red-300 text-sm">{erro}</p>
+          <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/50 rounded-xl px-4 py-3 mb-5">
+            <p className="text-red-700 dark:text-red-300 text-sm">{erro}</p>
           </div>
         )}
 
-        {/* Mensagem de confirmação */}
         {confirmacao && (
-          <div className="bg-emerald-950/40 border border-emerald-800/50 rounded-xl px-4 py-3 mb-5">
-            <p className="text-emerald-300 text-sm">{confirmacao}</p>
+          <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 rounded-xl px-4 py-3 mb-5">
+            <p className="text-emerald-700 dark:text-emerald-300 text-sm">{confirmacao}</p>
           </div>
         )}
 
         <div className="space-y-4 mb-6">
           <div>
-            <label className="block text-zinc-400 text-sm font-medium mb-1.5">
+            <label className="block text-zinc-600 dark:text-zinc-400 text-sm font-medium mb-1.5">
               E-mail
             </label>
             <input
@@ -102,13 +100,13 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
-              className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 text-zinc-50 placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-base"
+              className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-xl px-4 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-base"
               style={{ minHeight: "44px" }}
             />
           </div>
 
           <div>
-            <label className="block text-zinc-400 text-sm font-medium mb-1.5">
+            <label className="block text-zinc-600 dark:text-zinc-400 text-sm font-medium mb-1.5">
               Senha
             </label>
             <input
@@ -116,7 +114,7 @@ export default function LoginPage() {
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               placeholder="Mínimo 6 caracteres"
-              className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 text-zinc-50 placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-base"
+              className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-xl px-4 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-base"
               style={{ minHeight: "44px" }}
             />
           </div>
@@ -129,15 +127,11 @@ export default function LoginPage() {
           style={{ minHeight: "48px" }}
         >
           {carregando
-            ? modo === "entrar"
-              ? "Entrando..."
-              : "Criando conta..."
-            : modo === "entrar"
-            ? "Entrar"
-            : "Criar conta"}
+            ? modo === "entrar" ? "Entrando..." : "Criando conta..."
+            : modo === "entrar" ? "Entrar" : "Criar conta"}
         </button>
 
-        <p className="text-zinc-500 text-sm text-center mt-6">
+        <p className="text-zinc-400 dark:text-zinc-500 text-sm text-center mt-6">
           {modo === "entrar" ? "Não tem conta?" : "Já tem conta?"}{" "}
           <button
             onClick={() => {
@@ -145,7 +139,7 @@ export default function LoginPage() {
               setErro("");
               setConfirmacao("");
             }}
-            className="text-violet-400 hover:text-violet-300 transition-colors"
+            className="text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors"
           >
             {modo === "entrar" ? "Criar conta" : "Entrar"}
           </button>

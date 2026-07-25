@@ -46,11 +46,9 @@ export default function ResultadoPage() {
     setErro("");
 
     let query = supabase.from("roteiro").select("*");
-
     if (id) {
       query = query.eq("id", id);
     } else {
-      // Sem id: busca o mais recente
       query = query.order("criado_em", { ascending: false }).limit(1);
     }
 
@@ -64,9 +62,7 @@ export default function ResultadoPage() {
     setCarregando(false);
   }, [id]);
 
-  useEffect(() => {
-    buscar();
-  }, [buscar]);
+  useEffect(() => { buscar(); }, [buscar]);
 
   function copiar() {
     if (!roteiro) return;
@@ -77,9 +73,7 @@ export default function ResultadoPage() {
   }
 
   async function mudarStatus(novoStatus: string) {
-    if (!roteiro || salvandoStatus) return;
-    if (novoStatus === roteiro.status) return;
-
+    if (!roteiro || salvandoStatus || novoStatus === roteiro.status) return;
     setSalvandoStatus(true);
     setErroStatus("");
     setSucessoStatus("");
@@ -103,7 +97,7 @@ export default function ResultadoPage() {
   if (carregando) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-zinc-500 text-sm">Carregando roteiro...</p>
+        <p className="text-zinc-400 dark:text-zinc-500 text-sm">Carregando roteiro...</p>
       </div>
     );
   }
@@ -111,13 +105,13 @@ export default function ResultadoPage() {
   if (erro || !roteiro) {
     return (
       <div className="pb-8">
-        <div className="bg-red-950/40 border border-red-800/50 rounded-xl px-4 py-3 mb-4">
-          <p className="text-red-300 text-sm mb-2">
+        <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/50 rounded-xl px-4 py-3 mb-4">
+          <p className="text-red-700 dark:text-red-300 text-sm mb-2">
             {erro || "Nenhum roteiro encontrado."}
           </p>
           <button
             onClick={buscar}
-            className="text-xs text-violet-400 hover:text-violet-300 transition-colors underline underline-offset-2"
+            className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-500 transition-colors underline underline-offset-2"
           >
             Tentar de novo
           </button>
@@ -135,32 +129,32 @@ export default function ResultadoPage() {
 
   return (
     <div className="pb-8">
-      {/* Cabeçalho do resultado */}
+      {/* Cabeçalho */}
       <div className="mb-6">
-        <span className="inline-block bg-violet-950/60 text-violet-300 text-xs font-medium px-3 py-1 rounded-full border border-violet-800/40 mb-3">
+        <span className="inline-block bg-violet-100 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 text-xs font-medium px-3 py-1 rounded-full border border-violet-200 dark:border-violet-800/40 mb-3">
           {LABELS_OBJETIVO[roteiro.objetivo] ?? roteiro.objetivo}
         </span>
-        <h1 className="text-xl font-bold text-zinc-50">{roteiro.topico}</h1>
+        <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">{roteiro.topico}</h1>
       </div>
 
       {/* Aviso de protótipo */}
-      <div className="bg-amber-950/40 border border-amber-800/40 rounded-xl px-4 py-3 mb-6">
-        <p className="text-amber-300 text-xs">
+      <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/40 rounded-xl px-4 py-3 mb-6">
+        <p className="text-amber-700 dark:text-amber-300 text-xs">
           <span className="font-semibold">Dia 9 →</span> A IA real entra no
           Dia 9. Este é um roteiro de exemplo para você ver como ficará.
         </p>
       </div>
 
       {/* O roteiro */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 mb-6">
-        <p className="text-zinc-200 text-base leading-[1.85] whitespace-pre-wrap">
+      <div className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 mb-6">
+        <p className="text-zinc-800 dark:text-zinc-200 text-base leading-[1.85] whitespace-pre-wrap">
           {roteiro.roteiro_gerado}
         </p>
       </div>
 
       {/* Controle de status */}
       <div className="mb-5">
-        <p className="text-zinc-500 text-xs mb-2">Status do roteiro</p>
+        <p className="text-zinc-400 dark:text-zinc-500 text-xs mb-2">Status do roteiro</p>
         <div className="flex gap-2">
           {STATUS_OPCOES.map((s) => {
             const ativo = roteiro.status === s.valor;
@@ -171,8 +165,8 @@ export default function ResultadoPage() {
                 disabled={salvandoStatus}
                 className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                   ativo
-                    ? "border-violet-500 bg-violet-950/40 text-violet-300"
-                    : "border-zinc-800 bg-zinc-900 text-zinc-500 hover:border-zinc-700 hover:text-zinc-300"
+                    ? "border-violet-500 bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300"
+                    : "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-500 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-700 dark:hover:text-zinc-300"
                 }`}
               >
                 {s.label}
@@ -180,14 +174,8 @@ export default function ResultadoPage() {
             );
           })}
         </div>
-
-        {/* Feedback de status */}
-        {erroStatus && (
-          <p className="text-red-300 text-xs mt-2">{erroStatus}</p>
-        )}
-        {sucessoStatus && (
-          <p className="text-emerald-400 text-xs mt-2">{sucessoStatus}</p>
-        )}
+        {erroStatus && <p className="text-red-600 dark:text-red-300 text-xs mt-2">{erroStatus}</p>}
+        {sucessoStatus && <p className="text-emerald-600 dark:text-emerald-400 text-xs mt-2">{sucessoStatus}</p>}
       </div>
 
       {/* Botões */}
@@ -196,8 +184,8 @@ export default function ResultadoPage() {
           onClick={copiar}
           className={`w-full font-semibold py-4 rounded-xl transition-all text-base border ${
             copiado
-              ? "bg-emerald-950/40 border-emerald-700/60 text-emerald-300"
-              : "bg-zinc-800 border-zinc-700 text-zinc-50 hover:bg-zinc-700"
+              ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700/60 text-emerald-700 dark:text-emerald-300"
+              : "bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-50 hover:bg-zinc-200 dark:hover:bg-zinc-700"
           }`}
           style={{ minHeight: "48px" }}
         >
@@ -206,7 +194,7 @@ export default function ResultadoPage() {
 
         <Link
           href="/gerar"
-          className="block w-full text-center border border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700 font-medium py-4 rounded-xl transition-colors text-base"
+          className="block w-full text-center border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:border-zinc-300 dark:hover:border-zinc-700 font-medium py-4 rounded-xl transition-colors text-base"
           style={{ minHeight: "48px", lineHeight: "1" }}
         >
           <span className="flex items-center justify-center h-full">
