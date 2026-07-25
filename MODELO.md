@@ -49,6 +49,7 @@ Guarda cada roteiro gerado. Um perfil pode ter muitos roteiros. Esta tabela não
 | `roteiro_gerado` | texto longo | sim | O roteiro completo devolvido pela IA |
 | `texto_bruto` | texto longo | não | O texto cru que a pessoa colou, se houver — para a IA entender o estilo dela por amostras reais |
 | `confianca` | número (0 a 1) | não | O quanto a IA confia que o roteiro gerado corresponde ao perfil e objetivo — 0 é incerto, 1 é muito confiante |
+| `status` | lista fechada | sim | Etapa do roteiro no fluxo de uso: `rascunho`, `aprovado` ou `publicado`. Nasce sempre como `rascunho`. |
 | `criado_em` | data e hora | sim | Quando o roteiro foi gerado |
 
 ---
@@ -100,6 +101,22 @@ Quando o login existir, o sistema filtra automaticamente: cada pessoa só vê se
 | `reels` | Vídeo vertical curto (até ~90s) | Texto corrido único — a pessoa lê ou decora como se fosse uma fala contínua |
 | `post` | Publicação estática (imagem ou vídeo parado) | Texto corrido único — geralmente vai para a legenda ou para o texto sobreposto na imagem |
 | `carrossel` | Sequência de slides deslizáveis | Exatamente 8 blocos de texto, cada um iniciado com `Slide 1:` até `Slide 8:` — essa marcação é uma convenção de formatação dentro do mesmo campo de texto, não uma tabela separada |
+
+---
+
+## Valores possíveis do campo `status`
+
+> **Para quem não conhece o termo:** "status" é simplesmente em que etapa aquele roteiro está. Pense como um post-it colado no roteiro impresso: ainda estou revisando, já aprovei para gravar, ou já gravei e postei.
+
+| Valor | Significado | Quando usar |
+|---|---|---|
+| `rascunho` | Roteiro gerado, ainda não revisado | É o valor automático de todo roteiro novo — a pessoa ainda não decidiu se vai usar |
+| `aprovado` | A pessoa leu e decidiu que vai gravar | Ela gostou do roteiro e marcou como aprovado antes de gravar |
+| `publicado` | O conteúdo já foi ao ar | Ela gravou, editou e publicou — ciclo completo |
+
+**Por que esse campo importa:** com o status registrado, é possível no futuro mostrar um histórico separado por etapa ("o que ainda preciso gravar", "o que já postei"), gerar relatórios e evitar regravações desnecessárias.
+
+---
 
 **Modelo de como fica um roteiro de carrossel dentro do campo `roteiro_gerado`:**
 
