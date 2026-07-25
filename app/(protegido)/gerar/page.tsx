@@ -11,6 +11,17 @@ const OBJETIVOS = [
   { id: "remarketing",    label: "+ Remarketing", descricao: "Quem viu mas não comprou" },
 ];
 
+const TIPOS_TRAFEGO = [
+  { id: "organico", label: "Orgânico", descricao: "Conteúdo espontâneo, sem impulsionamento" },
+  { id: "pago",     label: "Pago",     descricao: "Anúncio, pode ser pra vendas, engajamento ou mensagens no direct" },
+];
+
+const FORMATOS = [
+  { id: "reels",     label: "Reels",     descricao: "Vídeo vertical curto" },
+  { id: "post",      label: "Post",      descricao: "Imagem estática" },
+  { id: "carrossel", label: "Carrossel", descricao: "8 slides" },
+];
+
 // Roteiro de exemplo até a IA real entrar no Dia 9
 const ROTEIRO_EXEMPLO = `Eu precisava te contar uma coisa sobre culpa materna que muita gente não fala.
 
@@ -26,12 +37,14 @@ Salva esse vídeo para quando você precisar lembrar que está fazendo melhor do
 
 export default function GerarPage() {
   const [objetivo, setObjetivo] = useState("relacionamento");
+  const [tipo_trafego, setTipoTrafego] = useState("organico");
+  const [formato, setFormato] = useState("reels");
   const [topico, setTopico] = useState("");
   const [gerando, setGerando] = useState(false);
   const [erro, setErro] = useState("");
   const router = useRouter();
 
-  const pode_gerar = objetivo !== "" && topico.trim() !== "";
+  const pode_gerar = objetivo !== "" && tipo_trafego !== "" && formato !== "" && topico.trim() !== "";
 
   async function gerar() {
     if (!pode_gerar || gerando) return;
@@ -54,6 +67,8 @@ export default function GerarPage() {
     const { error: erroRoteiro } = await supabase.from("roteiro").insert({
       perfil_id: perfil.id,
       objetivo,
+      tipo_trafego,
+      formato,
       topico,
       roteiro_gerado: ROTEIRO_EXEMPLO,
     });
@@ -105,6 +120,70 @@ export default function GerarPage() {
                 </p>
                 <p className="text-xs leading-relaxed text-zinc-500">
                   {obj.descricao}
+                </p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Tipo de tráfego */}
+      <div className="mb-7">
+        <p className="text-zinc-300 text-sm font-medium mb-3">
+          Tráfego orgânico ou pago?{" "}
+          <span className="text-violet-500">*</span>
+        </p>
+        <div className="grid grid-cols-2 gap-3">
+          {TIPOS_TRAFEGO.map((t) => {
+            const ativo = tipo_trafego === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setTipoTrafego(t.id)}
+                className={`text-left p-4 rounded-xl border transition-all ${
+                  ativo
+                    ? "border-violet-500 bg-violet-950/40"
+                    : "border-zinc-800 bg-zinc-900/50 hover:border-zinc-700"
+                }`}
+                style={{ minHeight: "80px" }}
+              >
+                <p className={`font-semibold text-sm mb-1 ${ativo ? "text-violet-300" : "text-zinc-300"}`}>
+                  {t.label}
+                </p>
+                <p className="text-xs leading-relaxed text-zinc-500">
+                  {t.descricao}
+                </p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Formato */}
+      <div className="mb-7">
+        <p className="text-zinc-300 text-sm font-medium mb-3">
+          Qual o formato de entrega?{" "}
+          <span className="text-violet-500">*</span>
+        </p>
+        <div className="grid grid-cols-3 gap-3">
+          {FORMATOS.map((f) => {
+            const ativo = formato === f.id;
+            return (
+              <button
+                key={f.id}
+                onClick={() => setFormato(f.id)}
+                className={`text-left p-4 rounded-xl border transition-all ${
+                  ativo
+                    ? "border-violet-500 bg-violet-950/40"
+                    : "border-zinc-800 bg-zinc-900/50 hover:border-zinc-700"
+                }`}
+                style={{ minHeight: "80px" }}
+              >
+                <p className={`font-semibold text-sm mb-1 ${ativo ? "text-violet-300" : "text-zinc-300"}`}>
+                  {f.label}
+                </p>
+                <p className="text-xs leading-relaxed text-zinc-500">
+                  {f.descricao}
                 </p>
               </button>
             );
