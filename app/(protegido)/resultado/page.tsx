@@ -1,28 +1,99 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
-const ROTEIRO_EXEMPLO = `Eu precisava te contar uma coisa sobre culpa materna que muita gente não fala.
+const LABELS_OBJETIVO: Record<string, string> = {
+  descoberta:     "+ Seguidores",
+  relacionamento: "+ Interação",
+  conversao:      "+ Vendas",
+  remarketing:    "+ Remarketing",
+};
 
-Quando você grita, quando perde a paciência, quando passa o dia no automático — a culpa que vem depois não significa que você é uma mãe ruim. Significa que você se importa. Mãe que não liga não sente culpa.
-
-O problema não é sentir culpa. O problema é quando ela fica parada, só te punindo, sem virar nada. Aí ela drena ao invés de construir.
-
-O que eu aprendi depois de muito choro e muita conversa com Deus é isso: culpa que vira ação é graça. É o que separa a mãe que cresce da mãe que só sobrevive. Você não precisa ser perfeita. Precisa ser presente e honesta com você mesma.
-
-Se esse peso está pesado demais, o guia devocional Enquanto Eles Crescem tem um capítulo inteiro que me ajudou a transformar culpa em propósito. O link está na bio.
-
-Salva esse vídeo para quando você precisar lembrar que está fazendo melhor do que pensa.`;
+type Roteiro = {
+  id: string;
+  objetivo: string;
+  topico: string;
+  roteiro_gerado: string;
+  tipo_trafego: string;
+  formato: string;
+  status: string;
+  criado_em: string;
+};
 
 export default function ResultadoPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const id = searchParams.get("id");
+
+  const [roteiro, setRoteiro] = useState<Roteiro | null>(null);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState("");
   const [copiado, setCopiado] = useState(false);
 
+  useEffect(() => {
+    async function buscar() {
+      setCarregando(true);
+      setErro("");
+
+      let query = supabase.from("roteiro").select("*");
+
+      if (id) {
+        // Busca o roteiro específico pelo id
+        query = query.eq("id", id);
+      } else {
+        // Sem id: busca o mais recente
+        query = query.order("criado_em", { ascending: false }).limit(1);
+      }
+
+      const { data, error } = await query.single();
+
+      if (error || !data) {
+        setErro("Roteiro não encontrado.");
+      } else {
+        setRoteiro(data);
+      }
+      setCarregando(false);
+    }
+
+    buscar();
+  }, [id]);
+
   function copiar() {
-    navigator.clipboard.writeText(ROTEIRO_EXEMPLO).then(() => {
+    if (!roteiro) return;
+    navigator.clipboard.writeText(roteiro.roteiro_gerado).then(() => {
       setCopiado(true);
       setTimeout(() => setCopiado(false), 2000);
     });
+  }
+
+  if (carregando) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <p className="text-zinc-500 text-sm">Carregando roteiro...</p>
+      </div>
+    );
+  }
+
+  if (erro || !roteiro) {
+    return (
+      <div className="pb-8">
+        <div className="bg-red-950/40 border border-red-800/50 rounded-xl px-4 py-3 mb-6">
+          <p className="text-red-300 text-sm">
+            {erro || "Nenhum roteiro encontrado."}
+          </p>
+        </div>
+        <Link
+          href="/gerar"
+          className="block w-full text-center bg-violet-600 hover:bg-violet-500 text-white font-semibold py-4 rounded-xl transition-colors text-base"
+          style={{ minHeight: "48px", lineHeight: "48px" }}
+        >
+          Gerar meu primeiro roteiro
+        </Link>
+      </div>
+    );
   }
 
   return (
@@ -30,9 +101,9 @@ export default function ResultadoPage() {
       {/* Cabeçalho do resultado */}
       <div className="mb-6">
         <span className="inline-block bg-violet-950/60 text-violet-300 text-xs font-medium px-3 py-1 rounded-full border border-violet-800/40 mb-3">
-          Relacionamento
+          {LABELS_OBJETIVO[roteiro.objetivo] ?? roteiro.objetivo}
         </span>
-        <h1 className="text-xl font-bold text-zinc-50">culpa materna</h1>
+        <h1 className="text-xl font-bold text-zinc-50">{roteiro.topico}</h1>
       </div>
 
       {/* Aviso de protótipo */}
@@ -46,7 +117,7 @@ export default function ResultadoPage() {
       {/* O roteiro */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 mb-6">
         <p className="text-zinc-200 text-base leading-[1.85] whitespace-pre-wrap">
-          {ROTEIRO_EXEMPLO}
+          {roteiro.roteiro_gerado}
         </p>
       </div>
 
