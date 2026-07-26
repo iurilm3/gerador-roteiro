@@ -72,27 +72,33 @@ function normalizar(texto: string) {
   return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-// Combobox de subtema com busca
-function SubtemaCombobox({
+type OpcaoCombobox = { id: string; label: string; descricao: string };
+
+// Combobox genérico reutilizável com busca
+function Combobox({
+  opcoes,
   valor,
   onChange,
+  placeholder,
 }: {
+  opcoes: OpcaoCombobox[];
   valor: string;
   onChange: (id: string) => void;
+  placeholder: string;
 }) {
   const [aberto, setAberto] = useState(false);
   const [busca, setBusca] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const selecionado = SUBTEMAS_MATRIZ.find((s) => s.id === valor);
+  const selecionado = opcoes.find((s) => s.id === valor);
 
   const filtrados = busca.trim()
-    ? SUBTEMAS_MATRIZ.filter((s) =>
+    ? opcoes.filter((s) =>
         normalizar(s.label).includes(normalizar(busca)) ||
         normalizar(s.descricao).includes(normalizar(busca))
       )
-    : SUBTEMAS_MATRIZ;
+    : opcoes;
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -125,46 +131,44 @@ function SubtemaCombobox({
     setBusca("");
   }
 
+  const IconeLupa = () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+  );
+
   return (
     <div ref={containerRef} className="relative">
-      {/* Campo fechado */}
       {!aberto ? (
         <button
           onClick={abrir}
           className="w-full flex items-center gap-3 bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-xl px-4 text-left transition-colors hover:border-violet-400 focus:outline-none focus:border-violet-500"
           style={{ minHeight: "44px" }}
         >
-          <svg className="shrink-0 text-zinc-400 dark:text-zinc-500" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-          </svg>
+          <span className="shrink-0 text-zinc-400 dark:text-zinc-500"><IconeLupa /></span>
           {selecionado ? (
             <span className="text-zinc-900 dark:text-zinc-50 text-sm font-medium">{selecionado.label}</span>
           ) : (
-            <span className="text-zinc-400 dark:text-zinc-600 text-sm">Buscar subtema... (ex: Clickbait, Prova, Contraste)</span>
+            <span className="text-zinc-400 dark:text-zinc-600 text-sm">{placeholder}</span>
           )}
         </button>
       ) : (
-        /* Campo de busca aberto */
         <div className="bg-zinc-100 dark:bg-zinc-900 border border-violet-500 rounded-xl overflow-hidden">
           <div className="flex items-center gap-3 px-4" style={{ minHeight: "44px" }}>
-            <svg className="shrink-0 text-violet-400" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
+            <span className="shrink-0 text-violet-400"><IconeLupa /></span>
             <input
               ref={inputRef}
               type="text"
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              placeholder="Buscar subtema..."
+              placeholder="Buscar..."
               className="flex-1 bg-transparent text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-600 text-sm focus:outline-none py-3"
             />
           </div>
-
-          {/* Lista de resultados */}
           <div className="border-t border-zinc-200 dark:border-zinc-800 overflow-y-auto" style={{ maxHeight: "260px" }}>
             {filtrados.length === 0 ? (
               <p className="text-zinc-400 dark:text-zinc-600 text-sm text-center py-4">
-                Nenhum subtema encontrado.
+                Nenhuma opção encontrada.
               </p>
             ) : (
               filtrados.map((s) => {
@@ -329,30 +333,24 @@ export default function GerarPage() {
         </div>
       </Section>
 
-      {/* 4. Categoria da Matriz — cards menores */}
+      {/* 4. Categoria da Matriz — combobox */}
       <Section titulo="Qual o ângulo do roteiro?">
-        <div className={`grid gap-2 ${categoriasPorObjetivo(objetivo).length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
-          {categoriasPorObjetivo(objetivo).map((c) => {
-            const ativo = categoria_matriz === c.id;
-            return (
-              <button
-                key={c.id}
-                onClick={() => setCategoriaMatriz(c.id)}
-                className={`text-left px-3 py-2.5 rounded-xl border transition-all w-full h-full ${ativo ? cardAtivo : cardInativo}`}
-              >
-                <p className={`font-semibold text-sm mb-1 ${ativo ? labelAtivo : labelInativo}`}>
-                  {c.label}
-                </p>
-                <p className="text-xs leading-snug text-zinc-400 dark:text-zinc-500">{c.descricao}</p>
-              </button>
-            );
-          })}
-        </div>
+        <Combobox
+          opcoes={categoriasPorObjetivo(objetivo)}
+          valor={categoria_matriz}
+          onChange={setCategoriaMatriz}
+          placeholder="Buscar ângulo... (ex: Urgência, Oportunidade)"
+        />
       </Section>
 
       {/* 5. Subtema — combobox com busca */}
       <Section titulo="Qual o subtema?">
-        <SubtemaCombobox valor={subtema_matriz} onChange={setSubtemaMatriz} />
+        <Combobox
+          opcoes={SUBTEMAS_MATRIZ}
+          valor={subtema_matriz}
+          onChange={setSubtemaMatriz}
+          placeholder="Buscar subtema... (ex: Clickbait, Prova, Contraste)"
+        />
       </Section>
 
       {/* 6. Formato */}
