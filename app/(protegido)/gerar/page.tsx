@@ -338,7 +338,7 @@ export default function GerarPage() {
               <button
                 key={c.id}
                 onClick={() => setCategoriaMatriz(c.id)}
-                className={`text-left px-3 py-2.5 rounded-xl border transition-all ${ativo ? cardAtivo : cardInativo}`}
+                className={`text-left px-3 py-2.5 rounded-xl border transition-all w-full h-full ${ativo ? cardAtivo : cardInativo}`}
               >
                 <p className={`font-semibold text-sm mb-1 ${ativo ? labelAtivo : labelInativo}`}>
                   {c.label}
