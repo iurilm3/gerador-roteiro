@@ -44,8 +44,10 @@ Guarda cada roteiro gerado. Um perfil pode ter muitos roteiros. Esta tabela não
 | `perfil_id` | texto (UUID) | sim | Qual perfil foi usado como base |
 | `objetivo` | lista fechada | sim | Uma de quatro opções: `descoberta`, `relacionamento`, `conversao`, `remarketing` |
 | `tipo_trafego` | lista fechada | sim | Origem do tráfego: `organico` ou `pago` |
-| `formato` | lista fechada | sim | Formato do conteúdo: `reels`, `post` ou `carrossel` |
+| `formato` | lista fechada | sim | Formato do conteúdo: `reels`, `post`, `carrossel` ou `stories` |
 | `topico` | texto | sim | O tema digitado pela pessoa (ex: culpa materna) |
+| `categoria_matriz` | lista fechada | sim | Categoria da Matriz de Ângulos: `urgencia_oculta`, `oportunidade` ou `prontidao`. As opções disponíveis dependem do objetivo. |
+| `subtema_matriz` | lista fechada | sim | Subtema da Matriz de Ângulos: um dos 18 valores fixos (ex: `clickbait`, `historia`, `prova`). Sempre os mesmos 18, independente do objetivo ou categoria. |
 | `roteiro_gerado` | texto longo | sim | O roteiro completo devolvido pela IA |
 | `texto_bruto` | texto longo | não | O texto cru que a pessoa colou, se houver — para a IA entender o estilo dela por amostras reais |
 | `confianca` | número (0 a 1) | não | O quanto a IA confia que o roteiro gerado corresponde ao perfil e objetivo — 0 é incerto, 1 é muito confiante |
@@ -101,6 +103,7 @@ Quando o login existir, o sistema filtra automaticamente: cada pessoa só vê se
 | `reels` | Vídeo vertical curto (até ~90s) | Texto corrido único — a pessoa lê ou decora como se fosse uma fala contínua |
 | `post` | Publicação estática (imagem ou vídeo parado) | Texto corrido único — geralmente vai para a legenda ou para o texto sobreposto na imagem |
 | `carrossel` | Sequência de slides deslizáveis | Exatamente 8 blocos de texto, cada um iniciado com `Slide 1:` até `Slide 8:` — essa marcação é uma convenção de formatação dentro do mesmo campo de texto, não uma tabela separada |
+| `stories` | Sequência de telas rápidas nos Stories | Texto corrido único ou segmentado por tela, dependendo da instrução da IA |
 
 ---
 
@@ -115,6 +118,51 @@ Quando o login existir, o sistema filtra automaticamente: cada pessoa só vê se
 | `publicado` | O conteúdo já foi ao ar | Ela gravou, editou e publicou — ciclo completo |
 
 **Por que esse campo importa:** com o status registrado, é possível no futuro mostrar um histórico separado por etapa ("o que ainda preciso gravar", "o que já postei"), gerar relatórios e evitar regravações desnecessárias.
+
+---
+
+---
+
+## Valores possíveis do campo `categoria_matriz`
+
+> **O que é a Matriz de Ângulos:** é uma forma de refinar o ângulo do roteiro antes de gerar. Em vez de só dizer "quero falar sobre culpa materna", você define se quer abordar pelo ângulo da urgência, da oportunidade ou da prontidão do público. Isso muda a construção do argumento do roteiro.
+
+**Atenção:** as opções disponíveis dependem do objetivo escolhido:
+- **Descoberta ou Relacionamento** → 2 opções: Urgência Oculta e Oportunidade
+- **Conversão ou Remarketing** → 3 opções: Urgência Oculta, Oportunidade e Prontidão
+
+| Valor | Rótulo na tela | Quando usar |
+|---|---|---|
+| `urgencia_oculta` | Urgência Oculta | O público tem um problema que ainda não percebeu como urgente — o roteiro revela a urgência |
+| `oportunidade` | Oportunidade | Existe uma janela, uma vantagem ou um caminho que o público ainda não viu — o roteiro apresenta |
+| `prontidao` | Prontidão | O público já sabe que precisa, já considerou a solução — o roteiro empurra para a decisão final |
+
+---
+
+## Valores possíveis do campo `subtema_matriz`
+
+> Os 18 subtemas aparecem sempre inteiros, em qualquer combinação de objetivo e categoria — eles não são filtrados. "Oportunidade" aparece aqui e também como categoria no campo acima: isso é intencional, os dois existem de forma independente.
+
+| Valor no banco | Rótulo na tela |
+|---|---|
+| `clickbait` | Clickbait |
+| `sensacao` | Sensação |
+| `mito` | Mito |
+| `contraste` | Contraste |
+| `prova` | Prova |
+| `dilema` | Dilema |
+| `visual` | Visual |
+| `certo_vs_errado` | Certo vs Errado |
+| `apelo_emocional` | Apelo Emocional |
+| `comparacao` | Comparação |
+| `curiosidade` | Curiosidade |
+| `demonstracao` | Demonstração |
+| `oportunidade` | Oportunidade |
+| `ultra_segmentado` | Ultra Segmentado |
+| `historia` | História |
+| `reflexao` | Reflexão |
+| `explicacao` | Explicação |
+| `problema_solucao` | Problema/Solução |
 
 ---
 
