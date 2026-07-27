@@ -23,6 +23,7 @@ type Item = {
   objetivo: string;
   subtema_matriz: string;
   criado_em: string;
+  tipo_trafego: string;
 };
 
 type ProporcaoItem = {
@@ -114,7 +115,7 @@ export default function DashboardPage() {
     async function buscar() {
       const { data, error } = await supabase
         .from("roteiro")
-        .select("id, objetivo, subtema_matriz, criado_em");
+        .select("id, objetivo, subtema_matriz, criado_em, tipo_trafego");
       if (error) {
         setErro("Não conseguimos carregar os dados. Tente recarregar a página.");
       } else {
@@ -177,6 +178,21 @@ export default function DashboardPage() {
     : dias === 1    ? "Seu último roteiro foi ontem."
     : `Seu último roteiro foi há ${dias} dias.`;
   const consistenciaVermelha = dias !== null && dias > 3;
+
+  // Alerta de Remarketing — usa todos os roteiros, ignora período
+  const roteiros_pagos = roteiros.filter((r) => r.tipo_trafego === "pago");
+  const totalRemarketing = roteiros.filter((r) => r.objetivo === "remarketing").length;
+  let alertaRemarketingAtivo = false;
+  let diasPrimeiroPago = 0;
+  if (roteiros_pagos.length > 0 && totalRemarketing === 0) {
+    const primeiroPago = roteiros_pagos.reduce((acc, r) =>
+      r.criado_em < acc.criado_em ? r : acc
+    );
+    diasPrimeiroPago = Math.floor(
+      (Date.now() - new Date(primeiroPago.criado_em).getTime()) / 86_400_000
+    );
+    alertaRemarketingAtivo = diasPrimeiroPago >= 7;
+  }
 
   if (carregando) {
     return (
@@ -333,6 +349,22 @@ export default function DashboardPage() {
                         </Link>
                       )}
                     </>
+                  )}
+                  {objetivo === "remarketing" && alertaRemarketingAtivo && (
+                    <div className="mt-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/40 rounded-xl px-4 py-3">
+                      <div className="flex gap-2 items-start mb-3">
+                        <span className="text-amber-500 shrink-0 text-sm">⚠</span>
+                        <p className="text-amber-700 dark:text-amber-300 text-xs leading-relaxed">
+                          Você roda tráfego pago há {diasPrimeiroPago} dias e ainda não criou nenhum roteiro de Remarketing. Se sua campanha está trazendo bastante tráfego diário, você já pode ter público suficiente pra ativar o Remarketing — confira o tamanho do seu público personalizado no Gerenciador de Anúncios antes de criar.
+                        </p>
+                      </div>
+                      <Link
+                        href="/gerar?objetivo=remarketing"
+                        className="inline-block text-xs font-semibold text-amber-700 dark:text-amber-300 underline underline-offset-2 hover:text-amber-600 dark:hover:text-amber-200 transition-colors"
+                      >
+                        Gerar roteiro de Remarketing →
+                      </Link>
+                    </div>
                   )}
                 </div>
               ))}
