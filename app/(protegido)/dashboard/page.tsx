@@ -111,6 +111,67 @@ export default function DashboardPage() {
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
 
+  // Estados do resumo do dia (Edge Function)
+  const [textoResumo, setTextoResumo] = useState("");
+  const [loadingResumo, setLoadingResumo] = useState(false);
+  const [erroResumo, setErroResumo] = useState("");
+  const [copiadoResumo, setCopiadoResumo] = useState(false);
+
+  // Chama a Edge Function do Supabase com o JWT do usuário logado.
+  // O JWT é o "cartão de identidade" da sessão — já existe no navegador,
+  // não é nenhuma chave secreta nova.
+  async function gerarResumo() {
+    setLoadingResumo(true);
+    setErroResumo("");
+    setTextoResumo("");
+    setCopiadoResumo(false);
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+
+    if (!token) {
+      setErroResumo("Sessão expirada. Recarregue a página e tente de novo.");
+      setLoadingResumo(false);
+      return;
+    }
+
+    // A URL da Edge Function segue sempre o padrão:
+    // {URL_DO_SUPABASE}/functions/v1/{nome-da-função}
+    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/resumo-do-dia`;
+
+    try {
+      const res = await fetch(url, {
+        headers: {
+          // Authorization leva o JWT — o Supabase verifica e só executa se válido
+          Authorization: `Bearer ${token}`,
+          // apikey identifica de qual projeto Supabase é esse pedido
+          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
+        },
+      });
+
+      if (!res.ok) {
+        setErroResumo("Não foi possível gerar o resumo. Tente de novo.");
+        setLoadingResumo(false);
+        return;
+      }
+
+      const texto = await res.text();
+      setTextoResumo(texto);
+    } catch {
+      setErroResumo("Erro de conexão. Verifique sua internet e tente de novo.");
+    }
+
+    setLoadingResumo(false);
+  }
+
+  function copiarResumo() {
+    if (!textoResumo) return;
+    navigator.clipboard.writeText(textoResumo).then(() => {
+      setCopiadoResumo(true);
+      setTimeout(() => setCopiadoResumo(false), 2000);
+    });
+  }
+
   useEffect(() => {
     async function buscar() {
       const { data, error } = await supabase
@@ -433,6 +494,42 @@ export default function DashboardPage() {
             </Link>
           )}
         </div>
+      </div>
+
+      {/* Resumo do dia — chama a Edge Function */}
+      <div className="mt-6">
+        <button
+          onClick={gerarResumo}
+          disabled={loadingResumo}
+          className="w-full bg-violet-600 hover:bg-violet-500 active:bg-violet-700 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 dark:disabled:text-zinc-600 disabled:cursor-not-allowed text-white font-semibold py-4 rounded-xl transition-colors text-base"
+          style={{ minHeight: "48px" }}
+        >
+          {loadingResumo ? "Gerando resumo..." : "Gerar resumo do dia"}
+        </button>
+
+        {erroResumo && (
+          <p className="text-red-600 dark:text-red-400 text-xs mt-3 text-center">
+            {erroResumo}
+          </p>
+        )}
+
+        {textoResumo && (
+          <div className="mt-4 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5">
+            <p className="text-zinc-800 dark:text-zinc-200 text-sm leading-relaxed whitespace-pre-wrap font-mono">
+              {textoResumo}
+            </p>
+            <button
+              onClick={copiarResumo}
+              className={`mt-4 w-full font-semibold py-3 rounded-xl transition-all text-sm border ${
+                copiadoResumo
+                  ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700/60 text-emerald-700 dark:text-emerald-300"
+                  : "bg-zinc-200 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-50 hover:bg-zinc-300 dark:hover:bg-zinc-700"
+              }`}
+            >
+              {copiadoResumo ? "Copiado! ✓" : "Copiar resumo"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
