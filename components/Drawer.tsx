@@ -162,6 +162,20 @@ export default function Drawer({ email, fechar }: Props) {
           </Link>
         </div>
 
+        {/* Link painel */}
+        <div className="px-4 py-2 border-b border-zinc-200/60 dark:border-zinc-800/60">
+          <Link
+            href="/painel"
+            onClick={fechar}
+            className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors text-sm"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            Painel do dia
+          </Link>
+        </div>
+
         {/* Campo de busca */}
         <div className="px-4 py-3 border-b border-zinc-200/60 dark:border-zinc-800/60">
           <input
