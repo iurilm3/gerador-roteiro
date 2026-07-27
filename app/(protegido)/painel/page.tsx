@@ -46,16 +46,13 @@ function calcularProporcoes(roteiros: Item[]): ProporcaoItem[] {
   for (const r of roteiros) {
     contagemObj[r.objetivo] = (contagemObj[r.objetivo] ?? 0) + 1;
   }
-  const totalSemRemark =
-    (contagemObj["descoberta"] ?? 0) +
-    (contagemObj["relacionamento"] ?? 0) +
-    (contagemObj["conversao"] ?? 0);
+  const totalPeriodo = roteiros.length;
 
   return ["descoberta", "relacionamento", "conversao", "remarketing"].map((obj) => {
     const count = contagemObj[obj] ?? 0;
     const meta = METAS[obj] ?? null;
     let pct = 0;
-    if (meta !== null && totalSemRemark > 0) pct = count / totalSemRemark;
+    if (meta !== null && totalPeriodo > 0) pct = count / totalPeriodo;
     let status: ProporcaoItem["status"] = "sem_meta";
     if (meta !== null) {
       const diff = pct - meta;
@@ -304,11 +301,11 @@ export default function PainelPage() {
               {proporcoes.map(({ objetivo, label, count, pct, meta, status }) => (
                 <div key={objetivo}>
                   <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-1.5 min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
                       {meta !== null && <StatusIcon status={status} />}
                       <span className="text-zinc-600 dark:text-zinc-400 text-xs font-medium">{label}</span>
                       {meta === null && (
-                        <span className="text-zinc-400 dark:text-zinc-600 text-xs truncate">
+                        <span className="text-zinc-400 dark:text-zinc-600 text-xs">
                           · Reativo — sem meta de proporção
                         </span>
                       )}
