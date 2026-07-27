@@ -101,7 +101,7 @@ function StatusIcon({ status }: { status: ProporcaoItem["status"] }) {
   return null;
 }
 
-export default function PainelPage() {
+export default function DashboardPage() {
   const [roteiros, setRoteiros] = useState<Item[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
@@ -181,7 +181,7 @@ export default function PainelPage() {
   if (carregando) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-zinc-400 dark:text-zinc-500 text-sm">Carregando painel...</p>
+        <p className="text-zinc-400 dark:text-zinc-500 text-sm">Carregando dashboard...</p>
       </div>
     );
   }
@@ -197,7 +197,7 @@ export default function PainelPage() {
   if (roteiros.length === 0) {
     return (
       <div className="pb-8">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 mb-1">Painel do dia</h1>
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 mb-1">Dashboard</h1>
         <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-8">
           Diagnóstico da sua produção de roteiros.
         </p>
@@ -227,7 +227,7 @@ export default function PainelPage() {
 
   return (
     <div className="pb-8">
-      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 mb-1">Painel do dia</h1>
+      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 mb-1">Dashboard</h1>
       <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-5">
         Diagnóstico da sua produção de roteiros.
       </p>
