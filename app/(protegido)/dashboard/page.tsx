@@ -18,13 +18,34 @@ const LABELS_OBJETIVO: Record<string, string> = {
   remarketing:    "+ Remarketing",
 };
 
+const LABELS_FORMATO: Record<string, string> = {
+  reels:     "Reels",
+  post:      "Post",
+  carrossel: "Carrossel",
+  stories:   "Stories",
+};
+
+const LABELS_STATUS: Record<string, string> = {
+  rascunho:  "Rascunho",
+  aprovado:  "Aprovado",
+  publicado: "Publicado",
+};
+
 type Item = {
   id: string;
   objetivo: string;
   subtema_matriz: string;
   criado_em: string;
   tipo_trafego: string;
+  topico: string;
+  formato: string;
+  status: string;
 };
+
+// Remove acentos e coloca em minúsculo para busca sem diferenciar acento
+function normalizar(texto: string): string {
+  return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
 
 type ProporcaoItem = {
   objetivo: string;
@@ -111,6 +132,12 @@ export default function DashboardPage() {
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
 
+  // Estados da seção "Meus Roteiros"
+  const [busca, setBusca] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("todos");
+  const [filtroObjetivo, setFiltroObjetivo] = useState("todos");
+  const [filtroFormato, setFiltroFormato] = useState("todos");
+
   // Estados do resumo do dia (Edge Function)
   const [textoResumo, setTextoResumo] = useState("");
   const [loadingResumo, setLoadingResumo] = useState(false);
@@ -176,7 +203,8 @@ export default function DashboardPage() {
     async function buscar() {
       const { data, error } = await supabase
         .from("roteiro")
-        .select("id, objetivo, subtema_matriz, criado_em, tipo_trafego");
+        .select("id, objetivo, subtema_matriz, criado_em, tipo_trafego, topico, formato, status")
+        .order("criado_em", { ascending: false });
       if (error) {
         setErro("Não conseguimos carregar os dados. Tente recarregar a página.");
       } else {
@@ -254,6 +282,18 @@ export default function DashboardPage() {
     );
     alertaRemarketingAtivo = diasPrimeiroPago >= 7;
   }
+
+  // "Meus Roteiros" — filtra os 50 mais recentes por busca + 3 filtros
+  // Os roteiros já chegam ordenados por criado_em DESC (definido na query)
+  const lista50 = roteiros.slice(0, 50);
+  const termoBusca = normalizar(busca);
+  const roteiros_filtrados = lista50.filter((r) => {
+    if (termoBusca && !normalizar(r.topico ?? "").includes(termoBusca)) return false;
+    if (filtroStatus   !== "todos" && r.status   !== filtroStatus)   return false;
+    if (filtroObjetivo !== "todos" && r.objetivo  !== filtroObjetivo) return false;
+    if (filtroFormato  !== "todos" && r.formato   !== filtroFormato)  return false;
+    return true;
+  });
 
   if (carregando) {
     return (
@@ -528,6 +568,116 @@ export default function DashboardPage() {
             >
               {copiadoResumo ? "Copiado! ✓" : "Copiar resumo"}
             </button>
+          </div>
+        )}
+      </div>
+      {/* Meus Roteiros */}
+      <div className="mt-8">
+        <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 mb-4">Meus Roteiros</h2>
+
+        {/* Campo de busca */}
+        <input
+          type="text"
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          placeholder="Buscar por tema..."
+          className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-sm mb-3"
+        />
+
+        {/* 3 filtros em linha */}
+        <div className="grid grid-cols-3 gap-2 mb-5">
+          <select
+            value={filtroStatus}
+            onChange={(e) => setFiltroStatus(e.target.value)}
+            className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-xl px-2 py-2 text-zinc-700 dark:text-zinc-300 text-xs focus:outline-none focus:border-violet-500 transition-colors"
+          >
+            <option value="todos">Status</option>
+            <option value="rascunho">Rascunho</option>
+            <option value="aprovado">Aprovado</option>
+          </select>
+
+          <select
+            value={filtroObjetivo}
+            onChange={(e) => setFiltroObjetivo(e.target.value)}
+            className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-xl px-2 py-2 text-zinc-700 dark:text-zinc-300 text-xs focus:outline-none focus:border-violet-500 transition-colors"
+          >
+            <option value="todos">Objetivo</option>
+            <option value="descoberta">Seguidores</option>
+            <option value="relacionamento">Interação</option>
+            <option value="conversao">Vendas</option>
+            <option value="remarketing">Remarketing</option>
+          </select>
+
+          <select
+            value={filtroFormato}
+            onChange={(e) => setFiltroFormato(e.target.value)}
+            className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-xl px-2 py-2 text-zinc-700 dark:text-zinc-300 text-xs focus:outline-none focus:border-violet-500 transition-colors"
+          >
+            <option value="todos">Formato</option>
+            <option value="reels">Reels</option>
+            <option value="post">Post</option>
+            <option value="carrossel">Carrossel</option>
+            <option value="stories">Stories</option>
+          </select>
+        </div>
+
+        {/* Lista de cards */}
+        {roteiros.length === 0 ? (
+          <p className="text-zinc-400 dark:text-zinc-600 text-sm text-center py-6">
+            Você ainda não gerou nenhum roteiro.
+          </p>
+        ) : roteiros_filtrados.length === 0 ? (
+          <p className="text-zinc-400 dark:text-zinc-600 text-sm text-center py-6">
+            Nenhum roteiro encontrado com esses filtros.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {roteiros_filtrados.map((r) => {
+              const subLabel = SUBTEMAS_MATRIZ.find((s) => s.id === r.subtema_matriz)?.label ?? r.subtema_matriz;
+              const [ano, mes, dia] = r.criado_em.split("T")[0].split("-");
+              const dataFormatada = `${dia}/${mes}/${ano}`;
+              const statusAtivo = r.status === "aprovado";
+
+              return (
+                <div
+                  key={r.id}
+                  className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4"
+                >
+                  {/* Linha de topo: tema + badge de status */}
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <p className="text-zinc-900 dark:text-zinc-50 text-sm font-semibold leading-snug">
+                      {r.topico}
+                    </p>
+                    <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
+                      statusAtivo
+                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300"
+                        : "bg-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+                    }`}>
+                      {LABELS_STATUS[r.status] ?? r.status}
+                    </span>
+                  </div>
+
+                  {/* Metadados em linha */}
+                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-400 dark:text-zinc-500 mb-3">
+                    <span>{LABELS_OBJETIVO[r.objetivo] ?? r.objetivo}</span>
+                    <span>·</span>
+                    <span>{LABELS_FORMATO[r.formato] ?? r.formato}</span>
+                    <span>·</span>
+                    <span>{subLabel}</span>
+                    <span>·</span>
+                    <span>{dataFormatada}</span>
+                  </div>
+
+                  {/* Botão duplicar */}
+                  <Link
+                    href={`/gerar?duplicar=${r.id}`}
+                    className="inline-block text-xs font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors underline underline-offset-2"
+                  >
+                    Duplicar e gerar novo →
+                  </Link>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

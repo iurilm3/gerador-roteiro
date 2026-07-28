@@ -195,10 +195,33 @@ export default function GerarPage() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const obj = searchParams.get("objetivo");
-    const sub = searchParams.get("subtema");
+    const obj      = searchParams.get("objetivo");
+    const sub      = searchParams.get("subtema");
+    const duplicar = searchParams.get("duplicar");
+
+    // Pré-seleção simples por objetivo ou subtema (vindo do dashboard)
     if (obj && OBJETIVOS.some((o) => o.id === obj)) setObjetivo(obj);
     if (sub && SUBTEMAS_MATRIZ.some((s) => s.id === sub)) setSubtemaMatriz(sub);
+
+    // Duplicação: busca o roteiro original e pré-preenche todos os campos.
+    // O RLS garante que só encontra o roteiro se for do próprio usuário.
+    // Se não encontrar ou der erro, ignora silenciosamente.
+    if (duplicar) {
+      supabase
+        .from("roteiro")
+        .select("tipo_trafego, objetivo, topico, categoria_matriz, subtema_matriz, formato")
+        .eq("id", duplicar)
+        .single()
+        .then(({ data }) => {
+          if (!data) return;
+          if (data.tipo_trafego) setTipoTrafego(data.tipo_trafego);
+          if (data.objetivo && OBJETIVOS.some((o) => o.id === data.objetivo)) setObjetivo(data.objetivo);
+          if (data.topico)   setTopico(data.topico);
+          if (data.categoria_matriz) setCategoriaMatriz(data.categoria_matriz);
+          if (data.subtema_matriz && SUBTEMAS_MATRIZ.some((s) => s.id === data.subtema_matriz)) setSubtemaMatriz(data.subtema_matriz);
+          if (data.formato)  setFormato(data.formato);
+        });
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
