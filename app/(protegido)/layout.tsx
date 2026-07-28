@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import Drawer from "@/components/Drawer";
 
@@ -42,9 +43,13 @@ export default function ProtegidoLayout({
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-zinc-950">
       <header className="sticky top-0 z-10 bg-white dark:bg-zinc-950 border-b border-zinc-200/60 dark:border-zinc-800/60 px-6 py-4 flex items-center justify-between">
-        <span className="text-violet-600 dark:text-violet-400 font-semibold text-sm tracking-widest uppercase">
+        <Link
+          href="/gerar"
+          className="text-violet-600 dark:text-violet-400 font-semibold text-sm tracking-widest uppercase cursor-pointer"
+          style={{ textShadow: "0 0 12px rgba(139, 92, 246, 0.45)" }}
+        >
           Rotex Master Ads
-        </span>
+        </Link>
 
         <div className="flex items-center gap-4">
           <button
