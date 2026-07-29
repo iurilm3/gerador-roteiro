@@ -414,7 +414,7 @@ Deno.serve(async (req: Request) => {
 
   // ── Chama a API do Gemini ─────────────────────────────────────────────────
   const geminiUrl =
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${geminiKey}`;
 
   let geminiResp: Response;
   try {
@@ -437,6 +437,9 @@ Deno.serve(async (req: Request) => {
   }
 
   if (!geminiResp.ok) {
+    const geminiStatus = geminiResp.status;
+    const geminiCorpo  = await geminiResp.text();
+    console.error("[gerar-roteiro] Gemini erro", geminiStatus, geminiCorpo);
     return erroJson(
       502,
       "O serviço de IA retornou um erro. Tente novamente em alguns instantes."
