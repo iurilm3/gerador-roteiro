@@ -200,16 +200,16 @@ function montarPrompt(params: {
   categoria_matriz: string;
   subtema_matriz: string;
   formato: string;
+  cta_especifico: string;
   perfil: {
     nicho: string;
     publico: string;
     produto: string;
     tom_de_voz: string;
     preferencias_estilo: string;
-    cta_principal: string | null;
   };
 }): string {
-  const { tipo_trafego, objetivo, topico, categoria_matriz, subtema_matriz, formato, perfil } = params;
+  const { tipo_trafego, objetivo, topico, categoria_matriz, subtema_matriz, formato, cta_especifico, perfil } = params;
 
   const subtema   = SUBTEMAS[subtema_matriz]    ?? { label: subtema_matriz,    descricao: "" };
   const categoria = CATEGORIAS[categoria_matriz] ?? { label: categoria_matriz, descricao: "" };
@@ -238,7 +238,6 @@ Público-alvo: ${perfil.publico}
 Produto ou serviço: ${perfil.produto}
 Tom de voz: ${perfil.tom_de_voz}
 Como prefere falar (estilo e preferências): ${perfil.preferencias_estilo}
-CTA principal da criadora: ${perfil.cta_principal ?? "não informado"}
 
 == ROTEIRO SOLICITADO ==
 Tema: ${topico}
@@ -255,8 +254,10 @@ ${instrucaoTrafego(tipo_trafego)}
 O subtema escolhido é "${subtema.label}". Instrução de abertura:
 ${instrucaoGancho(subtema_matriz)}
 
-== CTA PERMITIDO PARA ESTE OBJETIVO ==
-${instrucaoCTA(objetivo)}
+== CTA PARA ESTE ROTEIRO ==
+${cta_especifico
+  ? `Use exatamente este CTA definido pela criadora: "${cta_especifico}". Adapte a forma para o formato de saída, mas mantenha a essência do que está escrito.`
+  : instrucaoCTA(objetivo)}
 ${instrucaoArgumento(objetivo)}
 
 == FORMATO DE SAÍDA ==
@@ -357,7 +358,7 @@ Deno.serve(async (req: Request) => {
     return erroJson(400, "Pedido inválido. Tente novamente.");
   }
 
-  const { tipo_trafego, objetivo, topico, categoria_matriz, subtema_matriz, formato } =
+  const { tipo_trafego, objetivo, topico, categoria_matriz, subtema_matriz, formato, cta_especifico } =
     body as Record<string, unknown>;
 
   // Verifica presença de todos os campos obrigatórios
@@ -384,7 +385,7 @@ Deno.serve(async (req: Request) => {
   // O RLS garante que só retorna o perfil do próprio usuário logado.
   const { data: perfil, error: erroPerfil } = await supabase
     .from("perfil")
-    .select("nicho, publico, produto, tom_de_voz, preferencias_estilo, cta_principal")
+    .select("nicho, publico, produto, tom_de_voz, preferencias_estilo")
     .single();
 
   if (erroPerfil || !perfil) {
@@ -402,6 +403,7 @@ Deno.serve(async (req: Request) => {
     categoria_matriz: categoria_matriz as string,
     subtema_matriz:  subtema_matriz as string,
     formato:         formato as string,
+    cta_especifico:  typeof cta_especifico === "string" ? cta_especifico.trim() : "",
     perfil,
   });
 
@@ -425,7 +427,7 @@ Deno.serve(async (req: Request) => {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.85,
-          maxOutputTokens: 2048,
+          maxOutputTokens: 8192,
         },
       }),
     });

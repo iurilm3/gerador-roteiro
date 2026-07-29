@@ -11,7 +11,6 @@ type Dados = {
   produto: string;
   tom_de_voz: string;
   preferencias_estilo: string;
-  cta_principal: string;
 };
 
 const VAZIO: Dados = {
@@ -21,7 +20,6 @@ const VAZIO: Dados = {
   produto: "",
   tom_de_voz: "",
   preferencias_estilo: "",
-  cta_principal: "",
 };
 
 const OBRIGATORIOS: (keyof Dados)[] = [
@@ -62,7 +60,6 @@ export default function PerfilPage() {
           produto: data.produto ?? "",
           tom_de_voz: data.tom_de_voz ?? "",
           preferencias_estilo: data.preferencias_estilo ?? "",
-          cta_principal: data.cta_principal ?? "",
         });
       }
       if (error && error.code !== "PGRST116") {
@@ -140,8 +137,6 @@ export default function PerfilPage() {
           value={dados.tom_de_voz} onChange={(v) => setDados((p) => ({ ...p, tom_de_voz: v }))} obrigatorio />
         <Campo label="Como você prefere falar" placeholder="Ex: gosto de fala direta, sem hook engessado, sem trend"
           value={dados.preferencias_estilo} onChange={(v) => setDados((p) => ({ ...p, preferencias_estilo: v }))} linhas={3} obrigatorio />
-        <Campo label="CTA principal" dica="opcional" placeholder="Ex: salva esse vídeo para quando você precisar"
-          value={dados.cta_principal} onChange={(v) => setDados((p) => ({ ...p, cta_principal: v }))} />
       </div>
 
       <button

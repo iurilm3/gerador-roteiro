@@ -178,6 +178,8 @@ export default function GerarPage() {
   const [subtema_matriz, setSubtemaMatriz] = useState("clickbait");
   const [formato, setFormato] = useState("reels");
 
+  const [cta_especifico, setCtaEspecifico] = useState("");
+
   // Estados de geração e revisão
   const [gerando, setGerando]           = useState(false);
   const [salvando, setSalvando]         = useState(false);
@@ -261,6 +263,7 @@ export default function GerarPage() {
         body: JSON.stringify({
           tipo_trafego, objetivo, topico: topico.trim(),
           categoria_matriz, subtema_matriz, formato,
+          cta_especifico: cta_especifico.trim(),
         }),
       });
     } catch {
@@ -471,6 +474,25 @@ export default function GerarPage() {
           ))}
         </div>
       </Section>
+
+      {/* 7. CTA específico (opcional) */}
+      <div className="mb-7">
+        <div className="flex items-center gap-2 mb-3">
+          <p className="text-zinc-700 dark:text-zinc-300 text-sm font-medium">CTA específico</p>
+          <span className="text-zinc-400 dark:text-zinc-600 text-xs">opcional</span>
+        </div>
+        <input
+          type="text"
+          value={cta_especifico}
+          onChange={(e) => setCtaEspecifico(e.target.value)}
+          placeholder="Ex: salva esse vídeo para quando você precisar"
+          className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-xl px-4 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-base"
+          style={{ minHeight: "44px" }}
+        />
+        <p className="text-zinc-400 dark:text-zinc-600 text-xs mt-2 leading-relaxed">
+          Se preenchido, substitui a lógica automática de CTA por objetivo.
+        </p>
+      </div>
 
       {/* Botão */}
       <button
