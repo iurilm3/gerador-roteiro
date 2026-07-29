@@ -6,6 +6,9 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { SUBTEMAS_MATRIZ } from "@/lib/matriz";
 
+const SUPABASE_URL      = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
 const TIPOS_TRAFEGO = [
   { id: "organico", label: "Orgânico", descricao: "Conteúdo espontâneo, sem impulsionamento" },
   { id: "pago",     label: "Pago",     descricao: "Anúncio, pode ser pra vendas, engajamento ou mensagens no direct" },
@@ -29,7 +32,6 @@ function categoriasPorObjetivo(obj: string) {
   return CATEGORIAS_MATRIZ.filter((c) => c.id !== "prontidao");
 }
 
-
 const FORMATOS = [
   { id: "reels",     label: "Reels",     descricao: "Vídeo vertical curto" },
   { id: "post",      label: "Post",      descricao: "Imagem estática" },
@@ -37,25 +39,12 @@ const FORMATOS = [
   { id: "stories",   label: "Stories",   descricao: "Telas rápidas" },
 ];
 
-const ROTEIRO_EXEMPLO = `Eu precisava te contar uma coisa sobre culpa materna que muita gente não fala.
-
-Quando você grita, quando perde a paciência, quando passa o dia no automático — a culpa que vem depois não significa que você é uma mãe ruim. Significa que você se importa. Mãe que não liga não sente culpa.
-
-O problema não é sentir culpa. O problema é quando ela fica parada, só te punindo, sem virar nada. Aí ela drena ao invés de construir.
-
-O que eu aprendi depois de muito choro e muita conversa com Deus é isso: culpa que vira ação é graça. É o que separa a mãe que cresce da mãe que só sobrevive. Você não precisa ser perfeita. Precisa ser presente e honesta com você mesma.
-
-Se esse peso está pesado demais, o guia devocional Enquanto Eles Crescem tem um capítulo inteiro que me ajudou a transformar culpa em propósito. O link está na bio.
-
-Salva esse vídeo para quando você precisar lembrar que está fazendo melhor do que pensa.`;
-
 function normalizar(texto: string) {
   return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 type OpcaoCombobox = { id: string; label: string; descricao: string };
 
-// Combobox genérico reutilizável com busca
 function Combobox({
   opcoes,
   valor,
@@ -188,9 +177,15 @@ export default function GerarPage() {
   const [categoria_matriz, setCategoriaMatriz] = useState("urgencia_oculta");
   const [subtema_matriz, setSubtemaMatriz] = useState("clickbait");
   const [formato, setFormato] = useState("reels");
-  const [gerando, setGerando] = useState(false);
-  const [erro, setErro] = useState("");
-  const [erroPerfil, setErroPerfil] = useState(false);
+
+  // Estados de geração e revisão
+  const [gerando, setGerando]           = useState(false);
+  const [salvando, setSalvando]         = useState(false);
+  const [etapa, setEtapa]               = useState<"formulario" | "revisando">("formulario");
+  const [roteiroGerado, setRoteiroGerado] = useState("");
+  const [erro, setErro]                 = useState("");
+  const [erroPerfil, setErroPerfil]     = useState(false);
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -199,13 +194,9 @@ export default function GerarPage() {
     const sub      = searchParams.get("subtema");
     const duplicar = searchParams.get("duplicar");
 
-    // Pré-seleção simples por objetivo ou subtema (vindo do dashboard)
     if (obj && OBJETIVOS.some((o) => o.id === obj)) setObjetivo(obj);
     if (sub && SUBTEMAS_MATRIZ.some((s) => s.id === sub)) setSubtemaMatriz(sub);
 
-    // Duplicação: busca o roteiro original e pré-preenche todos os campos.
-    // O RLS garante que só encontra o roteiro se for do próprio usuário.
-    // Se não encontrar ou der erro, ignora silenciosamente.
     if (duplicar) {
       supabase
         .from("roteiro")
@@ -235,6 +226,7 @@ export default function GerarPage() {
     if (!disponiveis.includes(categoria_matriz)) setCategoriaMatriz("urgencia_oculta");
   }
 
+  // ── Chama a Edge Function e exibe o roteiro para revisão ──────────────────
   async function gerar() {
     if (gerando) return;
     setErro("");
@@ -249,37 +241,91 @@ export default function GerarPage() {
 
     setGerando(true);
 
+    // Pega o token de sessão — necessário para autenticar na Edge Function
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      setErro("Sessão expirada. Faça login novamente.");
+      setGerando(false);
+      return;
+    }
+
+    let resp: Response;
+    try {
+      resp = await fetch(`${SUPABASE_URL}/functions/v1/gerar-roteiro`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`,
+          "apikey": SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({
+          tipo_trafego, objetivo, topico: topico.trim(),
+          categoria_matriz, subtema_matriz, formato,
+        }),
+      });
+    } catch {
+      setErro("Sem conexão com o servidor. Verifique sua internet e tente novamente.");
+      setGerando(false);
+      return;
+    }
+
+    if (!resp.ok) {
+      // Erros da função chegam como JSON { erro: "mensagem" }
+      const corpo = await resp.json().catch(() => ({})) as { erro?: string };
+      setErro(corpo.erro ?? "Não foi possível gerar o roteiro. Tente novamente.");
+      setGerando(false);
+      return;
+    }
+
+    const texto = await resp.text();
+    if (!texto.trim()) {
+      setErro("O roteiro veio vazio. Tente novamente.");
+      setGerando(false);
+      return;
+    }
+
+    setRoteiroGerado(texto.trim());
+    setEtapa("revisando");
+    setGerando(false);
+  }
+
+  // ── Salva o roteiro aprovado no banco e redireciona ───────────────────────
+  async function salvar() {
+    if (salvando) return;
+    setSalvando(true);
+    setErro("");
+
     const { data: perfil, error: erroPerfil_ } = await supabase
       .from("perfil").select("id, nicho").single();
 
     if (erroPerfil_) {
       if (erroPerfil_.code === "PGRST116") {
-        setErro("Você ainda não preencheu seu perfil. Preencha o perfil antes de gerar o primeiro roteiro.");
+        setErro("Você ainda não preencheu seu perfil. Preencha o perfil antes de salvar o roteiro.");
         setErroPerfil(true);
       } else {
         setErro("Não conseguimos verificar seu perfil. Verifique sua conexão e tente de novo.");
       }
-      setGerando(false);
+      setSalvando(false);
       return;
     }
 
     if (!perfil) {
-      setErro("Você ainda não preencheu seu perfil. Preencha o perfil antes de gerar o primeiro roteiro.");
+      setErro("Você ainda não preencheu seu perfil. Preencha o perfil antes de salvar o roteiro.");
       setErroPerfil(true);
-      setGerando(false);
+      setSalvando(false);
       return;
     }
 
     const { error: erroRoteiro } = await supabase.from("roteiro").insert({
       perfil_id: perfil.id,
-      tipo_trafego, objetivo, topico,
+      tipo_trafego, objetivo, topico: topico.trim(),
       categoria_matriz, subtema_matriz, formato,
-      roteiro_gerado: ROTEIRO_EXEMPLO,
+      roteiro_gerado: roteiroGerado,
     });
 
     if (erroRoteiro) {
       setErro("Não foi possível salvar o roteiro. Verifique sua conexão e tente de novo.");
-      setGerando(false);
+      setSalvando(false);
       return;
     }
 
@@ -291,6 +337,55 @@ export default function GerarPage() {
   const labelAtivo   = "text-violet-700 dark:text-violet-300";
   const labelInativo = "text-zinc-700 dark:text-zinc-300";
 
+  // ── Tela de revisão do roteiro gerado ────────────────────────────────────
+  if (etapa === "revisando") {
+    return (
+      <div className="pb-8">
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 mb-1">Seu roteiro</h1>
+        <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-6 leading-relaxed">
+          Leia, ajuste se quiser e salve quando estiver pronto.
+        </p>
+
+        {erro && (
+          <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/50 rounded-xl px-4 py-3 mb-6">
+            <p className="text-red-700 dark:text-red-300 text-sm mb-2">{erro}</p>
+            {erroPerfil && (
+              <Link href="/perfil" className="inline-block text-xs font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 transition-colors underline underline-offset-2">
+                Preencher perfil agora →
+              </Link>
+            )}
+          </div>
+        )}
+
+        <textarea
+          value={roteiroGerado}
+          onChange={(e) => setRoteiroGerado(e.target.value)}
+          className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-4 text-zinc-900 dark:text-zinc-100 text-sm leading-relaxed focus:outline-none focus:border-violet-500 transition-colors resize-none mb-6"
+          style={{ minHeight: "340px" }}
+        />
+
+        <button
+          onClick={salvar}
+          disabled={salvando || !roteiroGerado.trim()}
+          className="w-full bg-violet-600 hover:bg-violet-500 active:bg-violet-700 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 dark:disabled:text-zinc-600 disabled:cursor-not-allowed text-white font-semibold py-4 rounded-xl transition-colors text-base mb-3"
+          style={{ minHeight: "48px" }}
+        >
+          {salvando ? "Salvando..." : "Salvar roteiro"}
+        </button>
+
+        <button
+          onClick={() => { setEtapa("formulario"); setErro(""); setErroPerfil(false); }}
+          disabled={salvando}
+          className="w-full bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-700 dark:text-zinc-300 font-semibold py-4 rounded-xl transition-colors text-base"
+          style={{ minHeight: "48px" }}
+        >
+          Gerar de novo
+        </button>
+      </div>
+    );
+  }
+
+  // ── Formulário de geração ─────────────────────────────────────────────────
   return (
     <div className="pb-8">
       <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 mb-1">Gerar roteiro</h1>
@@ -346,7 +441,7 @@ export default function GerarPage() {
         </div>
       </Section>
 
-      {/* 4. Categoria da Matriz — combobox */}
+      {/* 4. Categoria da Matriz */}
       <Section titulo="Qual o ângulo do roteiro?">
         <Combobox
           opcoes={categoriasPorObjetivo(objetivo)}
@@ -356,7 +451,7 @@ export default function GerarPage() {
         />
       </Section>
 
-      {/* 5. Subtema — combobox com busca */}
+      {/* 5. Subtema */}
       <Section titulo="Qual o subtema?">
         <Combobox
           opcoes={SUBTEMAS_MATRIZ}
