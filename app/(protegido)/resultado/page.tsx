@@ -137,14 +137,6 @@ export default function ResultadoPage() {
         <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">{roteiro.topico}</h1>
       </div>
 
-      {/* Aviso de protótipo */}
-      <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/40 rounded-xl px-4 py-3 mb-6">
-        <p className="text-amber-700 dark:text-amber-300 text-xs">
-          <span className="font-semibold">Dia 9 →</span> A IA real entra no
-          Dia 9. Este é um roteiro de exemplo para você ver como ficará.
-        </p>
-      </div>
-
       {/* O roteiro */}
       <div className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 mb-6">
         <p className="text-zinc-800 dark:text-zinc-200 text-base leading-[1.85] whitespace-pre-wrap">

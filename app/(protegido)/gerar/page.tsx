@@ -427,7 +427,7 @@ export default function GerarPage() {
           type="text"
           value={topico}
           onChange={(e) => setTopico(e.target.value)}
-          placeholder="Ex: culpa materna"
+          placeholder="Qual o assunto de hoje? Seja específico(a)."
           className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-xl px-4 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-base"
           style={{ minHeight: "44px" }}
         />
