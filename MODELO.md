@@ -22,11 +22,11 @@ Guarda a identidade da criadora. Uma pessoa pode ter um perfil. O perfil é a ba
 | `id` | texto (UUID) | sim | Identificador único gerado automaticamente |
 | `user_id` | texto (UUID) | sim | Quem é o dono deste perfil |
 | `nome_ou_marca` | texto | não | Nome pessoal ou nome da marca |
-| `nicho` | texto | sim | Área de atuação (ex: maternidade cristã) |
-| `publico` | texto | sim | Para quem ela fala (ex: mães cristãs com filhos pequenos) |
-| `produto` | texto | sim | O que ela vende (ex: guia devocional Enquanto Eles Crescem) |
-| `tom_de_voz` | texto | sim | Como ela fala (ex: acolhedor, direto, sem academicismo) |
-| `preferencias_estilo` | texto | sim | O que ela evita e prefere (ex: sem hook engessado, sem trend, fala conversacional) |
+| `nicho` | texto | sim | Área de atuação (ex: educação financeira para autônomos e freelancers) |
+| `publico` | texto | sim | Para quem fala (ex: autônomos de 28 a 45 anos que ganham bem mas vivem no aperto) |
+| `produto` | texto | sim | O que vende (ex: curso "Do Caos ao Controle", planilha "Fluxo Sem Susto") |
+| `tom_de_voz` | texto | sim | Como fala (ex: direto, prático, sem jargão de mercado financeiro) |
+| `preferencias_estilo` | texto | sim | O que evita e prefere (ex: nunca promessa de enriquecimento rápido, sempre exemplo concreto de número e situação real) |
 | `cta_principal` | texto | não | O que ela pede no final dos vídeos (ex: salva esse vídeo) |
 | `criado_em` | data e hora | sim | Quando o perfil foi criado |
 | `atualizado_em` | data e hora | sim | Quando o perfil foi editado pela última vez |

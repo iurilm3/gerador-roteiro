@@ -125,17 +125,17 @@ export default function PerfilPage() {
       )}
 
       <div className="space-y-5">
-        <Campo label="Nome ou marca" dica="opcional" placeholder="Ex: Jhonielly Oliveira"
+        <Campo label="Nome ou marca" dica="opcional" placeholder="Ex: Carlos Drummond Finanças"
           value={dados.nome_ou_marca} onChange={(v) => setDados((p) => ({ ...p, nome_ou_marca: v }))} />
-        <Campo label="Nicho" placeholder="Ex: maternidade cristã"
+        <Campo label="Nicho" placeholder="Ex: educação financeira para autônomos e freelancers"
           value={dados.nicho} onChange={(v) => setDados((p) => ({ ...p, nicho: v }))} obrigatorio />
-        <Campo label="Para quem você fala" placeholder="Ex: mães cristãs com filhos pequenos"
+        <Campo label="Para quem você fala" placeholder="Ex: autônomos e freelancers de 28 a 45 anos que ganham bem mas vivem no aperto por falta de organização financeira"
           value={dados.publico} onChange={(v) => setDados((p) => ({ ...p, publico: v }))} obrigatorio />
-        <Campo label="Seu produto principal" placeholder="Ex: guia devocional Enquanto Eles Crescem"
+        <Campo label="Seu produto principal" placeholder='Ex: curso "Do Caos ao Controle", planilha "Fluxo Sem Susto", mentoria "Liberdade em 90 Dias"'
           value={dados.produto} onChange={(v) => setDados((p) => ({ ...p, produto: v }))} obrigatorio />
-        <Campo label="Seu tom de voz" placeholder="Ex: acolhedor, direto, sem academicismo"
+        <Campo label="Seu tom de voz" placeholder="Ex: direto, prático, sem jargão de mercado financeiro, tom de mentor que já passou pelo aperto"
           value={dados.tom_de_voz} onChange={(v) => setDados((p) => ({ ...p, tom_de_voz: v }))} obrigatorio />
-        <Campo label="Como você prefere falar" placeholder="Ex: gosto de fala direta, sem hook engessado, sem trend"
+        <Campo label="Como você prefere falar" placeholder="Ex: nunca linguagem genérica nem promessa de enriquecimento rápido. Sempre exemplo concreto de número e situação real, tom de conversa entre amigos que puxam a real um pro outro"
           value={dados.preferencias_estilo} onChange={(v) => setDados((p) => ({ ...p, preferencias_estilo: v }))} linhas={3} obrigatorio />
       </div>
 

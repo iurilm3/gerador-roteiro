@@ -65,12 +65,12 @@ Campo de e-mail e um botão "Receber link de acesso". O sistema envia um link po
 **O que aparece na tela (de cima para baixo):**
 
 1. **Cabeçalho** — título simples: "Seu perfil de criadora"
-2. **Campo: Nicho** — texto curto. Exemplo dentro do campo para guiar: "Ex: maternidade cristã"
-3. **Campo: Para quem você fala** — texto curto. Exemplo: "Ex: mães cristãs com filhos pequenos"
-4. **Campo: Seu produto principal** — texto curto. Exemplo: "Ex: guia devocional Enquanto Eles Crescem"
-5. **Campo: Seu tom de voz** — texto curto. Exemplo: "Ex: acolhedor, direto, sem academicismo"
-6. **Campo: Como você prefere falar** — texto maior (duas linhas). Exemplo: "Ex: gosto de fala direta, sem hook engessado, sem trend, sem clichê de copywriter"
-7. **Campo: CTA principal** *(opcional)* — texto curto. Exemplo: "Ex: salva esse vídeo"
+2. **Campo: Nicho** — texto curto. Exemplo dentro do campo para guiar: "Ex: educação financeira para autônomos e freelancers"
+3. **Campo: Para quem você fala** — texto curto. Exemplo: "Ex: autônomos e freelancers de 28 a 45 anos que ganham bem mas vivem no aperto por falta de organização financeira"
+4. **Campo: Seu produto principal** — texto curto. Exemplo: "Ex: curso 'Do Caos ao Controle', planilha 'Fluxo Sem Susto', mentoria 'Liberdade em 90 Dias'"
+5. **Campo: Seu tom de voz** — texto curto. Exemplo: "Ex: direto, prático, sem jargão de mercado financeiro, tom de mentor que já passou pelo aperto"
+6. **Campo: Como você prefere falar** — texto maior (duas linhas). Exemplo: "Ex: nunca linguagem genérica nem promessa de enriquecimento rápido. Sempre exemplo concreto de número e situação real, tom de conversa entre amigos que puxam a real um pro outro"
+7. **Campo: CTA específico** *(opcional, agora na tela de geração, não aqui)* — movido para o formulário de /gerar
 8. **Botão: "Salvar e continuar"** — ocupa toda a largura da tela. Só fica ativo quando os cinco campos obrigatórios (nicho, público, produto, tom, preferências) estiverem preenchidos. Quando clica, salva no navegador e vai para a Tela 2.
 
 **Caso de borda:** se a pessoa tentar avançar com campos vazios, o botão permanece cinza e desabilitado. Os campos obrigatórios ganham uma borda colorida indicando que precisam ser preenchidos.
