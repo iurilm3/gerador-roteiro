@@ -373,6 +373,12 @@ Deno.serve(async (req: Request) => {
     return erroJson(400, "O tema não pode ter mais de 500 caracteres.");
   }
 
+  // Limita o CTA específico a 150 caracteres — é uma frase curta por natureza,
+  // limite evita injeção de texto longo no prompt
+  if (typeof cta_especifico === "string" && cta_especifico.trim().length > 150) {
+    return erroJson(400, "O CTA específico não pode ter mais de 150 caracteres.");
+  }
+
   // ── Registra a tentativa ANTES de chamar o Gemini ────────────────────────
   // Mesmo que o Gemini falhe depois, este clique já conta contra o limite.
   // O user_id é preenchido automaticamente pelo banco via DEFAULT auth.uid().
