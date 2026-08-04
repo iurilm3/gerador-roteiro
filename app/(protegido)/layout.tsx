@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import Drawer from "@/components/Drawer";
@@ -15,17 +15,40 @@ export default function ProtegidoLayout({
   const [emailUsuario, setEmailUsuario] = useState("");
   const [drawerAberto, setDrawerAberto] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    async function verificarAcesso() {
+      const { data } = await supabase.auth.getSession();
+
       if (!data.session) {
         router.replace("/login");
-      } else {
-        setEmailUsuario(data.session.user.email ?? "");
-        setVerificando(false);
+        return;
       }
-    });
-  }, [router]);
+
+      setEmailUsuario(data.session.user.email ?? "");
+
+      // A página /planos não verifica assinatura — evita loop de redirecionamento
+      if (pathname === "/planos") {
+        setVerificando(false);
+        return;
+      }
+
+      // Verifica se o usuário já tem ao menos uma linha na tabela assinatura
+      const { count } = await supabase
+        .from("assinatura")
+        .select("*", { count: "exact", head: true });
+
+      if ((count ?? 0) === 0) {
+        router.replace("/planos");
+        return;
+      }
+
+      setVerificando(false);
+    }
+
+    verificarAcesso();
+  }, [router, pathname]);
 
   async function sair() {
     await supabase.auth.signOut();
