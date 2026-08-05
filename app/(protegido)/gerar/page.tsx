@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { SUBTEMAS_MATRIZ } from "@/lib/matriz";
+import BannerAssinatura from "@/components/BannerAssinatura";
 
 const SUPABASE_URL      = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -392,9 +393,11 @@ export default function GerarPage() {
   return (
     <div className="pb-8">
       <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 mb-1">Gerar roteiro</h1>
-      <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-8 leading-relaxed">
+      <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-5 leading-relaxed">
         Preencha cada etapa e o roteiro chega em segundos.
       </p>
+
+      <BannerAssinatura />
 
       {erro && (
         <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/50 rounded-xl px-4 py-3 mb-6">

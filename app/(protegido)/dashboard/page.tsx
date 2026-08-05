@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { SUBTEMAS_MATRIZ } from "@/lib/matriz";
+import BannerAssinatura from "@/components/BannerAssinatura";
 
 const METAS: Record<string, number> = {
   descoberta:     0.70,
@@ -348,6 +349,8 @@ export default function DashboardPage() {
       <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-5">
         Diagnóstico da sua produção de roteiros.
       </p>
+
+      <BannerAssinatura />
 
       {/* Seletor de período */}
       <div className="mb-5">
