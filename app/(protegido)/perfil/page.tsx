@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
+
 type Dados = {
   nome_ou_marca: string;
   nicho: string;
@@ -37,6 +38,9 @@ export default function PerfilPage() {
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState(false);
+  const [assinaturaStatus, setAssinaturaStatus] = useState<string | null>(null);
+  const [cancelando, setCancelando] = useState(false);
+  const [erroCancelamento, setErroCancelamento] = useState("");
   const router = useRouter();
 
   const tudo_preenchido = OBRIGATORIOS.every((k) => dados[k].trim() !== "");
@@ -46,10 +50,10 @@ export default function PerfilPage() {
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData.session) return;
 
-      const { data, error } = await supabase
-        .from("perfil")
-        .select("*")
-        .single();
+      const [{ data, error }, { data: ass }] = await Promise.all([
+        supabase.from("perfil").select("*").single(),
+        supabase.from("assinatura").select("status").single(),
+      ]);
 
       if (data) {
         setPerfilId(data.id);
@@ -65,10 +69,32 @@ export default function PerfilPage() {
       if (error && error.code !== "PGRST116") {
         setErro("Não conseguimos carregar seu perfil. Tente recarregar a página.");
       }
+      if (ass) setAssinaturaStatus(ass.status);
       setCarregando(false);
     }
     carregar();
   }, []);
+
+  async function cancelarAssinatura() {
+    const confirmado = window.confirm(
+      "Tem certeza que quer cancelar sua assinatura? Essa ação não pode ser desfeita e seu acesso será interrompido imediatamente."
+    );
+    if (!confirmado) return;
+
+    setErroCancelamento("");
+    setCancelando(true);
+
+    const { error } = await supabase.functions.invoke("cancelar-assinatura");
+
+    setCancelando(false);
+
+    if (error) {
+      setErroCancelamento("Não foi possível cancelar sua assinatura. Tente de novo em instantes.");
+      return;
+    }
+
+    router.push("/planos?assinatura=cancelada");
+  }
 
   async function salvar() {
     if (!tudo_preenchido || salvando) return;
@@ -152,6 +178,23 @@ export default function PerfilPage() {
         <p className="text-zinc-400 dark:text-zinc-500 text-xs text-center mt-3">
           Preencha os campos obrigatórios (*) para continuar.
         </p>
+      )}
+
+      {assinaturaStatus !== null && assinaturaStatus !== "cancelada" && (
+        <div className="mt-10 pt-8 border-t border-zinc-200 dark:border-zinc-800">
+          {erroCancelamento && (
+            <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/50 rounded-xl px-4 py-3 mb-4">
+              <p className="text-red-700 dark:text-red-300 text-sm">{erroCancelamento}</p>
+            </div>
+          )}
+          <button
+            onClick={cancelarAssinatura}
+            disabled={cancelando}
+            className="w-full py-3 rounded-xl border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors"
+          >
+            {cancelando ? "Cancelando..." : "Cancelar assinatura"}
+          </button>
+        </div>
       )}
     </div>
   );

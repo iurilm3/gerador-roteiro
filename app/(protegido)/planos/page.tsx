@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 const PLANOS = {
@@ -25,6 +25,8 @@ export default function PlanosPage() {
   const [carregando, setCarregando] = useState<string | null>(null)
   const [erro, setErro] = useState<string | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const assinaturaCancelada = searchParams.get('assinatura') === 'cancelada'
 
   async function escolherPlano(plano: 'starter' | 'pro') {
     setErro(null)
@@ -97,6 +99,15 @@ export default function PlanosPage() {
           </button>
         </div>
       </div>
+
+      {/* Assinatura cancelada */}
+      {assinaturaCancelada && (
+        <div className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 mb-6">
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm text-center">
+            Sua assinatura foi cancelada. Escolha um novo plano quando quiser voltar.
+          </p>
+        </div>
+      )}
 
       {/* Erro */}
       {erro && (
