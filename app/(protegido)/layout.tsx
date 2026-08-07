@@ -28,19 +28,25 @@ export default function ProtegidoLayout({
 
       setEmailUsuario(data.session.user.email ?? "");
 
-      // A página /planos não verifica assinatura — evita loop de redirecionamento
-      if (pathname === "/planos") {
+      // /planos e /perfil ficam fora das verificações — evita loop de redirecionamento
+      if (pathname === "/planos" || pathname === "/perfil") {
         setVerificando(false);
         return;
       }
 
       // Verifica se o usuário já tem ao menos uma linha na tabela assinatura
-      const { count } = await supabase
-        .from("assinatura")
-        .select("*", { count: "exact", head: true });
+      const [{ count: countAssinatura }, { count: countPerfil }] = await Promise.all([
+        supabase.from("assinatura").select("*", { count: "exact", head: true }),
+        supabase.from("perfil").select("*", { count: "exact", head: true }),
+      ]);
 
-      if ((count ?? 0) === 0) {
+      if ((countAssinatura ?? 0) === 0) {
         router.replace("/planos");
+        return;
+      }
+
+      if ((countPerfil ?? 0) === 0) {
+        router.replace("/perfil");
         return;
       }
 

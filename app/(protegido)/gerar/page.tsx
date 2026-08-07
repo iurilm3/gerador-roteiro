@@ -417,17 +417,6 @@ export default function GerarPage() {
 
       <BannerAssinatura />
 
-      {erro && (
-        <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/50 rounded-xl px-4 py-3 mb-6">
-          <p className="text-red-700 dark:text-red-300 text-sm mb-2">{erro}</p>
-          {erroPerfil && (
-            <Link href="/perfil" className="inline-block text-xs font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 transition-colors underline underline-offset-2">
-              Preencher perfil agora →
-            </Link>
-          )}
-        </div>
-      )}
-
       {/* 1. Tráfego */}
       <Section titulo="Tráfego orgânico ou pago?">
         <div className="grid grid-cols-2 gap-3">
@@ -515,7 +504,18 @@ export default function GerarPage() {
         </p>
       </div>
 
-      {/* Botão */}
+      {/* Erro + Botão */}
+      {erro && (
+        <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/50 rounded-xl px-4 py-3 mb-4">
+          <p className="text-red-700 dark:text-red-300 text-sm mb-2">{erro}</p>
+          {erroPerfil && (
+            <Link href="/perfil" className="inline-block text-xs font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 transition-colors underline underline-offset-2">
+              Preencher perfil agora →
+            </Link>
+          )}
+        </div>
+      )}
+
       <button
         onClick={gerar}
         disabled={!pode_gerar || gerando}
