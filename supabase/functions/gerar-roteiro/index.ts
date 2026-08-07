@@ -12,7 +12,7 @@
 // · Rate limit: 20 tentativas/hora por usuário, contadas na tabela
 //   geracoes_log (sobrevive a reinício de servidor)
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 // ─── Dados da Matriz de Ângulos ───────────────────────────────────────────────
 // Copiado de lib/matriz.ts — a função precisa ser um arquivo único e
