@@ -137,9 +137,9 @@ Script para vídeo vertical de 30 a 60 segundos. Use as marcações de tempo aba
 Escreva o texto exato a ser falado em câmera em cada bloco. Tom conversacional, frases curtas.`,
 
     post: `
-Legenda para imagem estática. Estrutura obrigatória:
+Comece exatamente com a linha "HEADLINE (imagem):" seguida da frase curta e direta que vai estampada na capa/imagem do post. Deve funcionar sozinha, sem depender da legenda pra fazer sentido.
 
-SUGESTÃO DE HEADLINE (para a imagem): frase curta e direta que vai estampada na capa/imagem do post, separada da legenda. Deve funcionar sozinha, sem depender do texto de baixo para fazer sentido.
+Depois, pule uma linha e escreva exatamente "LEGENDA:", seguido da legenda completa, com esta estrutura (sem repetir os nomes das seções na legenda em si — eles são só guia de construção):
 
 GANCHO (1-2 linhas): primeira frase que para o scroll. Sem pergunta retórica. Sem exclamação.
 QUALIFICAÇÃO (1 parágrafo): para quem é essa mensagem.
