@@ -121,7 +121,9 @@ function instrucaoCTA(objetivo: string): string {
 }
 
 // ─── Instrução de formato de saída ───────────────────────────────────────────
-function instrucaoFormato(formato: string): string {
+function instrucaoFormato(formato: string, objetivo: string): string {
+  const storiesSpin = objetivo === "conversao" || objetivo === "remarketing";
+
   const mapa: Record<string, string> = {
     reels: `
 Script para vídeo vertical de 30 a 60 segundos. Use as marcações de tempo abaixo obrigatoriamente:
@@ -136,6 +138,8 @@ Escreva o texto exato a ser falado em câmera em cada bloco. Tom conversacional,
 
     post: `
 Legenda para imagem estática. Estrutura obrigatória:
+
+SUGESTÃO DE HEADLINE (para a imagem): frase curta e direta que vai estampada na capa/imagem do post, separada da legenda. Deve funcionar sozinha, sem depender do texto de baixo para fazer sentido.
 
 GANCHO (1-2 linhas): primeira frase que para o scroll. Sem pergunta retórica. Sem exclamação.
 QUALIFICAÇÃO (1 parágrafo): para quem é essa mensagem.
@@ -157,7 +161,18 @@ SLIDE 6 — BENEFÍCIOS: o que muda concretamente na vida do leitor quando o pro
 SLIDE 7 — URGÊNCIA: por que agir agora (janela de tempo real ou custo concreto de adiar).
 SLIDE 8 — CTA: próximo passo claro, verbo no imperativo, objeto concreto.`,
 
-    stories: `
+    stories: storiesSpin ? `
+3 a 5 telas sequenciais. Para cada tela, escreva "TELA X:" e forneça:
+- TEXTO: o que aparece escrito na tela (curto, direto, fonte grande)
+- VISUAL: sugestão de fundo, cor ou elemento visual (uma linha)
+- INTERAÇÃO: elemento interativo se aplicável (enquete, caixinha de pergunta, link) — opcional
+
+Estruture as telas seguindo o arco SPIN Selling:
+- Telas 1-2: Situação + Problema — mapeia o contexto e expõe a dor
+- Tela 3: Implicação — aprofunda a consequência de não agir
+- Tela 4: Necessidade de Solução — antes de apresentar o produto, faça o leitor "sentir" o desejo pela solução
+- Tela final: Fechamento/CTA direto
+Mantém o mesmo formato visual de TEXTO/VISUAL/INTERAÇÃO por tela que já existe.` : `
 3 a 5 telas sequenciais. Para cada tela, escreva "TELA X:" e forneça:
 - TEXTO: o que aparece escrito na tela (curto, direto, fonte grande)
 - VISUAL: sugestão de fundo, cor ou elemento visual (uma linha)
@@ -261,7 +276,7 @@ ${cta_especifico
 ${instrucaoArgumento(objetivo)}
 
 == FORMATO DE SAÍDA ==
-${instrucaoFormato(formato)}
+${instrucaoFormato(formato, objetivo)}
 
 == OS 15 PRINCÍPIOS QUE ESTE ROTEIRO DEVE SEGUIR ==
 1. Ensinar em vez de prometer — entregar aprendizado antes de oferecer produto.
