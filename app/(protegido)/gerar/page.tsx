@@ -183,6 +183,7 @@ export default function GerarPage() {
 
   // Estados de geração e revisão
   const [gerando, setGerando]           = useState(false);
+  const [progresso, setProgresso]       = useState(0);
   const [salvando, setSalvando]         = useState(false);
   const [etapa, setEtapa]               = useState<"formulario" | "revisando">("formulario");
   const [roteiroGerado, setRoteiroGerado] = useState("");
@@ -218,6 +219,23 @@ export default function GerarPage() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!gerando) {
+      setProgresso(0);
+      return;
+    }
+    setProgresso(0);
+    const inicio = Date.now();
+    const duracao = 18_000; // avança até 90% em 18 segundos
+    const timer = setInterval(() => {
+      const decorrido = Date.now() - inicio;
+      const pct = Math.min(90, (decorrido / duracao) * 90);
+      setProgresso(pct);
+      if (pct >= 90) clearInterval(timer);
+    }, 150);
+    return () => clearInterval(timer);
+  }, [gerando]);
 
   const pode_gerar =
     tipo_trafego !== "" && topico.trim() !== "" && objetivo !== "" &&
@@ -508,9 +526,17 @@ export default function GerarPage() {
       </button>
 
       {gerando && (
-        <p className="text-zinc-400 dark:text-zinc-500 text-xs text-center mt-3 animate-pulse">
-          Pode levar alguns segundos...
-        </p>
+        <div className="mt-4">
+          <div className="w-full bg-zinc-200 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+            <div
+              className="h-full bg-violet-500 rounded-full transition-all duration-150 ease-linear"
+              style={{ width: `${progresso}%` }}
+            />
+          </div>
+          <p className="text-zinc-500 dark:text-zinc-400 text-xs text-center mt-3 leading-relaxed">
+            Gerando seu roteiro... isso pode levar até 20 segundos
+          </p>
+        </div>
       )}
       {!pode_gerar && !gerando && (
         <p className="text-zinc-400 dark:text-zinc-500 text-xs text-center mt-3">
