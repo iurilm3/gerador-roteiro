@@ -43,22 +43,22 @@ Deno.serve(async (req: Request) => {
     return erroJson(500, "Configuração interna incompleta.");
   }
 
-  const prompt = `Você é um estrategista de conteúdo digital especializado no nicho abaixo.
+  const prompt = `Você é um estrategista de conteúdo digital. Gere exatamente 5 sugestões de tema para posts no Instagram, baseadas no perfil abaixo.
 
 Nicho: ${perfil.nicho}
-Público-alvo: ${perfil.publico}
-Produto ou serviço: ${perfil.produto}
+Público: ${perfil.publico}
+Produto: ${perfil.produto}
 
-Sugira exatamente 5 temas DIFERENTES para conteúdo no Instagram ou Facebook. Cada tema deve abordar um assunto completamente distinto dos outros quatro — não são variações do mesmo conceito, são 5 ideias independentes que a criadora poderia usar em 5 dias diferentes da semana.
+Cada sugestão deve ser um assunto diferente dos outros quatro — como se fossem temas para 5 dias distintos da semana. Varie entre: um problema que o público enfrenta, uma crença comum que merece ser questionada, um resultado ou transformação possível, e temas livres do nicho.
 
-Regras obrigatórias:
-- Os 5 temas precisam ser de assuntos diferentes entre si. Se dois temas forem sobre o mesmo conceito (mesmo que com palavras diferentes), substitua um por outro assunto.
-- Cada tema é uma frase afirmativa direta, máximo 10 palavras. Sem parênteses, sem dois-pontos, sem barra, sem "x" ou "vs".
-- Misture: pelo menos 1 tema de dor/problema do público, 1 de desmistificação de crença comum, 1 de resultado/transformação, e os demais livres dentro do nicho.
-- Específico o suficiente para gerar um roteiro direto — nada genérico.
-- Sem numeração, sem bullet points, sem aspas, sem texto antes ou depois.
+Exemplo de formato correto (adapte ao nicho real, não copie):
+Como parar de trabalhar mais e ganhar menos
+O erro que faz freelancers perderem clientes bons
+Quanto tempo leva para ter renda previsível
+Por que diversificar serviços pode te prejudicar
+O que clientes de alto valor realmente buscam
 
-Retorne APENAS os 5 temas, um por linha.`;
+Agora gere as 5 sugestões para o nicho acima. Responda apenas com as 5 linhas, sem introdução, sem numeração, sem explicações.`;
 
   const geminiUrl =
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${geminiKey}`;
