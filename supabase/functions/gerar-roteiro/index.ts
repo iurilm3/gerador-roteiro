@@ -162,17 +162,20 @@ SLIDE 7 — URGÊNCIA: por que agir agora (janela de tempo real ou custo concret
 SLIDE 8 — CTA: próximo passo claro, verbo no imperativo, objeto concreto.`,
 
     stories: storiesSpin ? `
-3 a 5 telas sequenciais. Para cada tela, escreva "TELA X:" e forneça:
+Entre 5 e 8 telas. Para cada tela, escreva "TELA X:" e forneça:
 - TEXTO: o que aparece escrito na tela (curto, direto, fonte grande)
 - VISUAL: sugestão de fundo, cor ou elemento visual (uma linha)
 - INTERAÇÃO: elemento interativo se aplicável (enquete, caixinha de pergunta, link) — opcional
 
-Estruture as telas seguindo o arco SPIN Selling:
-- Telas 1-2: Situação + Problema — mapeia o contexto e expõe a dor
-- Tela 3: Implicação — aprofunda a consequência de não agir
-- Tela 4: Necessidade de Solução — antes de apresentar o produto, faça o leitor "sentir" o desejo pela solução
-- Tela final: Fechamento/CTA direto
-Mantém o mesmo formato visual de TEXTO/VISUAL/INTERAÇÃO por tela que já existe.` : `
+Estruture entre 5 e 8 telas seguindo o arco SPIN Selling, nesta ordem obrigatória — nunca pule uma etapa, mas as etapas centrais podem ocupar mais de uma tela quando o argumento pedir mais desenvolvimento:
+
+TELA 1 — SITUAÇÃO (sempre 1 tela): mapeia o contexto atual do leitor, sem julgar.
+TELAS SEGUINTES — PROBLEMA (1 a 2 telas): expõe a dor específica, com dado ou cenário concreto. Use 2 telas só se houver mais de um ângulo de dor relevante pra desenvolver.
+TELAS SEGUINTES — IMPLICAÇÃO (1 a 2 telas): aprofunda o que piora se o problema não for resolvido — a consequência de continuar assim, não a solução ainda. Use 2 telas só se a consequência tiver camadas (ex: efeito imediato e efeito a longo prazo).
+1 TELA — NECESSIDADE DE SOLUÇÃO: antes de apresentar qualquer produto ou mecanismo, faça o leitor articular o próprio desejo pela solução — o que mudaria se isso fosse resolvido.
+1 TELA — FECHAMENTO: apresenta o caminho e o CTA direto.
+
+O total nunca deve passar de 8 telas. A implicação e a necessidade são etapas psicológicas diferentes — não pule da dor direto pra explicação técnica da solução, mesmo expandindo o número de telas.` : `
 3 a 5 telas sequenciais. Para cada tela, escreva "TELA X:" e forneça:
 - TEXTO: o que aparece escrito na tela (curto, direto, fonte grande)
 - VISUAL: sugestão de fundo, cor ou elemento visual (uma linha)
