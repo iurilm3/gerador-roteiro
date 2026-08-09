@@ -248,14 +248,32 @@ export default function GerarPage() {
     setSugestoes([]);
     setErroSugestao(false);
 
-    const { data, error } = await supabase.functions.invoke("sugerir-temas");
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { setSugerindo(false); setErroSugestao(true); return; }
 
-    setSugerindo(false);
-
-    if (error || !data?.temas?.length) {
+    let resp: Response;
+    try {
+      resp = await fetch(`${SUPABASE_URL}/functions/v1/sugerir-temas`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`,
+          "apikey": SUPABASE_ANON_KEY,
+        },
+      });
+    } catch {
+      setSugerindo(false);
       setErroSugestao(true);
       return;
     }
+
+    setSugerindo(false);
+
+    if (!resp.ok) { setErroSugestao(true); return; }
+
+    const data = await resp.json().catch(() => null);
+    if (!data?.temas?.length) { setErroSugestao(true); return; }
+
     setSugestoes((data.temas as string[]).slice(0, 3));
   }
 
