@@ -86,11 +86,21 @@ Agora gere as 5 sugestões para o nicho acima. Responda apenas com as 5 linhas, 
   };
 
   const texto = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  console.log("[sugerir-temas] resposta bruta:", JSON.stringify(texto));
+
   const temas = texto
-    .split("\n")
-    .map((l: string) => l.trim())
-    .filter((l: string) => l.length > 0)
+    .split(/\n+/)
+    .map((l: string) =>
+      l
+        .replace(/^\s*[\d]+[.)]\s*/, "") // remove "1. " ou "1) "
+        .replace(/^\s*[-*•]\s*/, "")     // remove "- " ou "* "
+        .replace(/\*\*/g, "")            // remove markdown bold
+        .trim()
+    )
+    .filter((l: string) => l.length > 8) // descarta linhas muito curtas (intro/rodapé)
     .slice(0, 5);
+
+  console.log("[sugerir-temas] temas parseados:", JSON.stringify(temas));
 
   if (temas.length === 0) {
     return erroJson(502, "Não conseguimos gerar sugestões. Tente novamente.");
