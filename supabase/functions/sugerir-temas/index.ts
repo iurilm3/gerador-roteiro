@@ -49,10 +49,7 @@ Nicho: ${perfil.nicho}
 Público: ${perfil.publico}
 Produto: ${perfil.produto}
 
-Cada sugestão deve ser um assunto completamente diferente das outras — como se fossem temas para 5 dias distintos da semana. Varie entre: um problema que o público enfrenta, uma crença comum que merece ser questionada, um resultado ou transformação possível, e temas relevantes do nicho.
-
-Responda APENAS com um array JSON válido contendo exatamente 5 strings. Sem texto antes, sem texto depois, sem markdown, sem bloco de código. Exemplo do formato esperado:
-["Tema um aqui", "Tema dois aqui", "Tema três aqui", "Tema quatro aqui", "Tema cinco aqui"]`;
+Cada sugestão deve ser um assunto completamente diferente das outras — como se fossem temas para 5 dias distintos da semana. Varie entre: um problema que o público enfrenta, uma crença comum que merece ser questionada, um resultado ou transformação possível, e temas relevantes do nicho. Cada tema deve ser uma frase curta e direta.`;
 
   const geminiUrl =
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${geminiKey}`;
@@ -64,7 +61,23 @@ Responda APENAS com um array JSON válido contendo exatamente 5 strings. Sem tex
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.9, maxOutputTokens: 512 },
+        generationConfig: {
+          temperature: 0.9,
+          maxOutputTokens: 512,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "object",
+            properties: {
+              temas: {
+                type: "array",
+                items: { type: "string" },
+                minItems: 5,
+                maxItems: 5,
+              },
+            },
+            required: ["temas"],
+          },
+        },
       }),
     });
   } catch {
@@ -80,26 +93,17 @@ Responda APENAS com um array JSON válido contendo exatamente 5 strings. Sem tex
   };
 
   const texto = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-  console.log("[sugerir-temas] resposta bruta:", JSON.stringify(texto));
 
-  // Extrai o array JSON da resposta — remove possível markdown ```json ... ```
-  const jsonStr = texto.replace(/```json\s*/gi, "").replace(/```/g, "").trim();
   let temas: string[] = [];
   try {
-    const parsed = JSON.parse(jsonStr);
-    if (Array.isArray(parsed)) {
-      temas = parsed.map((t: unknown) => String(t).trim()).filter((t) => t.length > 0).slice(0, 5);
-    }
-  } catch {
-    // fallback: tenta parsear linha a linha se o JSON falhar
-    temas = texto
-      .split(/\n+/)
-      .map((l: string) => l.replace(/^\s*[\d]+[.)]\s*/, "").replace(/^\s*[-*•"]\s*/,"").replace(/"/g,"").trim())
-      .filter((l: string) => l.length > 8)
+    const parsed = JSON.parse(texto);
+    temas = (parsed?.temas ?? parsed ?? [])
+      .map((t: unknown) => String(t).trim())
+      .filter((t: string) => t.length > 0)
       .slice(0, 5);
+  } catch {
+    console.error("[sugerir-temas] falha ao parsear JSON:", JSON.stringify(texto));
   }
-
-  console.log("[sugerir-temas] temas parseados:", JSON.stringify(temas));
 
   if (temas.length === 0) {
     return erroJson(502, "Não conseguimos gerar sugestões. Tente novamente.");
