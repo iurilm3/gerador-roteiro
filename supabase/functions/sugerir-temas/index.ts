@@ -49,12 +49,14 @@ Nicho: ${perfil.nicho}
 Público-alvo: ${perfil.publico}
 Produto ou serviço: ${perfil.produto}
 
-Sugira exatamente 5 temas para conteúdo no Instagram ou Facebook. Regras obrigatórias:
-- Cada tema é uma frase afirmativa simples, máximo 12 palavras. Sem subtítulo, sem parênteses, sem dois-pontos, sem barra (/), sem "x" de comparação, sem colchetes.
-- Frase única por tema — nunca duas ideias separadas por "ou", "x", "/" ou "vs" no mesmo tema.
-- Misture temas evergreen com pelo menos 2 temas ligados a debates ou dúvidas que ciclicamente voltam a performar bem neste nicho.
-- Cada tema deve ser específico o suficiente para gerar um roteiro direto — nada genérico.
-- Sem numeração, sem bullet points, sem aspas, sem texto introdutório ou final.
+Sugira exatamente 5 temas DIFERENTES para conteúdo no Instagram ou Facebook. Cada tema deve abordar um assunto completamente distinto dos outros quatro — não são variações do mesmo conceito, são 5 ideias independentes que a criadora poderia usar em 5 dias diferentes da semana.
+
+Regras obrigatórias:
+- Os 5 temas precisam ser de assuntos diferentes entre si. Se dois temas forem sobre o mesmo conceito (mesmo que com palavras diferentes), substitua um por outro assunto.
+- Cada tema é uma frase afirmativa direta, máximo 10 palavras. Sem parênteses, sem dois-pontos, sem barra, sem "x" ou "vs".
+- Misture: pelo menos 1 tema de dor/problema do público, 1 de desmistificação de crença comum, 1 de resultado/transformação, e os demais livres dentro do nicho.
+- Específico o suficiente para gerar um roteiro direto — nada genérico.
+- Sem numeração, sem bullet points, sem aspas, sem texto antes ou depois.
 
 Retorne APENAS os 5 temas, um por linha.`;
 
