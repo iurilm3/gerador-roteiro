@@ -49,11 +49,12 @@ Nicho: ${perfil.nicho}
 Público-alvo: ${perfil.publico}
 Produto ou serviço: ${perfil.produto}
 
-Sugira exatamente 5 temas para conteúdo no Instagram ou Facebook. Regras:
-- Misture temas evergreen (sempre relevantes) com pelo menos 2 temas ligados a assuntos que ciclicamente voltam a performar bem neste nicho — debates recorrentes, dúvidas frequentes que o público tem, ou ângulos que tendem a gerar engajamento nesta área.
-- Cada tema deve ser específico o suficiente para gerar um roteiro direto — nada genérico como "dicas de marketing".
-- Formule como "o que a criadora vai falar hoje", não como título de post.
-- Sem numeração, sem bullet points, sem aspas, sem nenhum texto introdutório ou final.
+Sugira exatamente 5 temas para conteúdo no Instagram ou Facebook. Regras obrigatórias:
+- Cada tema é uma frase afirmativa simples, máximo 12 palavras. Sem subtítulo, sem parênteses, sem dois-pontos, sem barra (/), sem "x" de comparação, sem colchetes.
+- Frase única por tema — nunca duas ideias separadas por "ou", "x", "/" ou "vs" no mesmo tema.
+- Misture temas evergreen com pelo menos 2 temas ligados a debates ou dúvidas que ciclicamente voltam a performar bem neste nicho.
+- Cada tema deve ser específico o suficiente para gerar um roteiro direto — nada genérico.
+- Sem numeração, sem bullet points, sem aspas, sem texto introdutório ou final.
 
 Retorne APENAS os 5 temas, um por linha.`;
 
