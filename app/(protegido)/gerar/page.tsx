@@ -269,9 +269,15 @@ export default function GerarPage() {
 
     setSugerindo(false);
 
-    if (!resp.ok) { setErroSugestao(true); return; }
+    if (!resp.ok) {
+      const body = await resp.text().catch(() => "");
+      console.error("[sugerir-temas] status:", resp.status, "body:", body);
+      setErroSugestao(true);
+      return;
+    }
 
-    const data = await resp.json().catch(() => null);
+    const data = await resp.json().catch((e) => { console.error("[sugerir-temas] parse erro:", e); return null; });
+    console.log("[sugerir-temas] data recebida:", JSON.stringify(data));
     if (!data?.temas?.length) { setErroSugestao(true); return; }
 
     setSugestoes((data.temas as string[]).slice(0, 3));
