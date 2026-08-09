@@ -42,7 +42,7 @@ export default function LoginPage() {
       if (error) {
         setErro(traduzErro(error.message));
       } else {
-        router.push("/perfil");
+        router.push("/gerar");
       }
     } else {
       const { error } = await supabase.auth.signUp({ email, password: senha });
