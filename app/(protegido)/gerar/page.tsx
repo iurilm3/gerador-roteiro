@@ -184,6 +184,7 @@ export default function GerarPage() {
   // Estados de sugestão de temas
   const [sugerindo, setSugerindo]       = useState(false);
   const [sugestoes, setSugestoes]       = useState<string[]>([]);
+  const [erroSugestao, setErroSugestao] = useState(false);
 
   // Estados de geração e revisão
   const [gerando, setGerando]           = useState(false);
@@ -245,12 +246,16 @@ export default function GerarPage() {
     if (sugerindo) return;
     setSugerindo(true);
     setSugestoes([]);
+    setErroSugestao(false);
 
     const { data, error } = await supabase.functions.invoke("sugerir-temas");
 
     setSugerindo(false);
 
-    if (error || !data?.temas?.length) return;
+    if (error || !data?.temas?.length) {
+      setErroSugestao(true);
+      return;
+    }
     setSugestoes(data.temas);
   }
 
@@ -460,13 +465,20 @@ export default function GerarPage() {
         />
 
         {sugestoes.length === 0 && (
-          <button
-            onClick={sugerirTemas}
-            disabled={sugerindo}
-            className="mt-2 text-xs text-violet-500 dark:text-violet-400 hover:text-violet-400 dark:hover:text-violet-300 disabled:opacity-50 transition-colors"
-          >
-            {sugerindo ? "Buscando ideias..." : "Está sem ideia hoje? Clique aqui e eu te ajudo"}
-          </button>
+          <div className="mt-2">
+            <button
+              onClick={sugerirTemas}
+              disabled={sugerindo}
+              className="text-xs text-violet-500 dark:text-violet-400 hover:text-violet-400 dark:hover:text-violet-300 disabled:opacity-50 transition-colors"
+            >
+              {sugerindo ? "Buscando ideias..." : "Está sem ideia hoje? Clique aqui e eu te ajudo"}
+            </button>
+            {erroSugestao && (
+              <p className="text-xs text-red-500 dark:text-red-400 mt-1">
+                Não conseguimos buscar sugestões. Tente de novo.
+              </p>
+            )}
+          </div>
         )}
 
         {sugestoes.length > 0 && (

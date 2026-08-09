@@ -43,13 +43,14 @@ Deno.serve(async (req: Request) => {
     return erroJson(500, "Configuração interna incompleta.");
   }
 
-  const prompt = `Você é um estrategista de conteúdo digital. Gere exatamente 5 sugestões de tema para posts no Instagram, baseadas no perfil abaixo.
+  const prompt = `Escreva 5 temas para posts no Instagram. Um tema por linha. Sem números, sem travessões, sem explicações, sem texto antes ou depois.
 
 Nicho: ${perfil.nicho}
 Público: ${perfil.publico}
 Produto: ${perfil.produto}
 
-Cada sugestão deve ser um assunto completamente diferente das outras — como se fossem temas para 5 dias distintos da semana. Varie entre: um problema que o público enfrenta, uma crença comum que merece ser questionada, um resultado ou transformação possível, e temas relevantes do nicho. Cada tema deve ser uma frase curta e direta.`;
+Os 5 temas (cada um em sua própria linha):
+`;
 
   const geminiUrl =
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${geminiKey}`;
@@ -61,23 +62,7 @@ Cada sugestão deve ser um assunto completamente diferente das outras — como s
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.9,
-          maxOutputTokens: 512,
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: "object",
-            properties: {
-              temas: {
-                type: "array",
-                items: { type: "string" },
-                minItems: 5,
-                maxItems: 5,
-              },
-            },
-            required: ["temas"],
-          },
-        },
+        generationConfig: { temperature: 0.9, maxOutputTokens: 400 },
       }),
     });
   } catch {
@@ -94,16 +79,17 @@ Cada sugestão deve ser um assunto completamente diferente das outras — como s
 
   const texto = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
-  let temas: string[] = [];
-  try {
-    const parsed = JSON.parse(texto);
-    temas = (parsed?.temas ?? parsed ?? [])
-      .map((t: unknown) => String(t).trim())
-      .filter((t: string) => t.length > 0)
-      .slice(0, 5);
-  } catch {
-    console.error("[sugerir-temas] falha ao parsear JSON:", JSON.stringify(texto));
-  }
+  console.log("[sugerir-temas] resposta bruta:", JSON.stringify(texto));
+
+  const temas = texto
+    .split(/\n/)
+    .map((l: string) =>
+      l.replace(/^\s*[\d]+[.)]\s*/, "").replace(/^\s*[-*•]\s*/, "").replace(/\*\*/g, "").trim()
+    )
+    .filter((l: string) => l.length > 5)
+    .slice(0, 5);
+
+  console.log("[sugerir-temas] temas:", JSON.stringify(temas));
 
   if (temas.length === 0) {
     return erroJson(502, "Não conseguimos gerar sugestões. Tente novamente.");
