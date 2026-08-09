@@ -69,7 +69,13 @@ Produto: ${perfil.produto}`;
   }
 
   if (!geminiResp.ok) {
-    return erroJson(502, "O serviço de IA retornou um erro. Tente novamente.");
+    const geminiStatus = geminiResp.status;
+    const geminiCorpo  = await geminiResp.text();
+    console.error("[sugerir-temas] Gemini erro", geminiStatus, geminiCorpo);
+    const msg = geminiStatus === 429
+      ? "Muitas requisições em sequência. Aguarde alguns segundos e tente de novo."
+      : "O serviço de IA retornou um erro. Tente novamente.";
+    return erroJson(502, msg);
   }
 
   const geminiData = await geminiResp.json() as {
