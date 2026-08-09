@@ -181,6 +181,10 @@ export default function GerarPage() {
 
   const [cta_especifico, setCtaEspecifico] = useState("");
 
+  // Estados de sugestão de temas
+  const [sugerindo, setSugerindo]       = useState(false);
+  const [sugestoes, setSugestoes]       = useState<string[]>([]);
+
   // Estados de geração e revisão
   const [gerando, setGerando]           = useState(false);
   const [progresso, setProgresso]       = useState(0);
@@ -236,6 +240,19 @@ export default function GerarPage() {
     }, 150);
     return () => clearInterval(timer);
   }, [gerando]);
+
+  async function sugerirTemas() {
+    if (sugerindo) return;
+    setSugerindo(true);
+    setSugestoes([]);
+
+    const { data, error } = await supabase.functions.invoke("sugerir-temas");
+
+    setSugerindo(false);
+
+    if (error || !data?.temas?.length) return;
+    setSugestoes(data.temas);
+  }
 
   const pode_gerar =
     tipo_trafego !== "" && topico.trim() !== "" && objetivo !== "" &&
@@ -436,11 +453,41 @@ export default function GerarPage() {
         <input
           type="text"
           value={topico}
-          onChange={(e) => setTopico(e.target.value)}
+          onChange={(e) => { setTopico(e.target.value); setSugestoes([]); }}
           placeholder="Qual o assunto de hoje? Seja específico(a)."
           className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-xl px-4 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-base"
           style={{ minHeight: "44px" }}
         />
+
+        {sugestoes.length === 0 && (
+          <button
+            onClick={sugerirTemas}
+            disabled={sugerindo}
+            className="mt-2 text-xs text-violet-500 dark:text-violet-400 hover:text-violet-400 dark:hover:text-violet-300 disabled:opacity-50 transition-colors"
+          >
+            {sugerindo ? "Buscando ideias..." : "Está sem ideia hoje? Clique aqui e eu te ajudo"}
+          </button>
+        )}
+
+        {sugestoes.length > 0 && (
+          <div className="mt-3 flex flex-col gap-2">
+            {sugestoes.map((tema, i) => (
+              <button
+                key={i}
+                onClick={() => { setTopico(tema); setSugestoes([]); }}
+                className="text-left w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:border-violet-400 dark:hover:border-violet-500 rounded-xl px-4 py-3 text-zinc-800 dark:text-zinc-200 text-sm transition-colors"
+              >
+                {tema}
+              </button>
+            ))}
+            <button
+              onClick={() => setSugestoes([])}
+              className="text-xs text-zinc-400 dark:text-zinc-600 hover:text-zinc-500 transition-colors mt-1"
+            >
+              Fechar sugestões
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 3. Objetivo */}
