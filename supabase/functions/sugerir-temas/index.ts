@@ -43,14 +43,13 @@ Deno.serve(async (req: Request) => {
     return erroJson(500, "Configuração interna incompleta.");
   }
 
-  const prompt = `Escreva 5 temas para posts no Instagram. Um tema por linha. Sem números, sem travessões, sem explicações, sem texto antes ou depois.
+  const prompt = `Gere 3 sugestões de tema para posts no Instagram sobre este perfil.
+Responda APENAS com um array JSON válido, sem texto antes ou depois, sem markdown, sem explicações. Exemplo do formato exato:
+["tema um", "tema dois", "tema três"]
 
 Nicho: ${perfil.nicho}
 Público: ${perfil.publico}
-Produto: ${perfil.produto}
-
-Os 5 temas (cada um em sua própria linha):
-`;
+Produto: ${perfil.produto}`;
 
   const geminiUrl =
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${geminiKey}`;
@@ -62,7 +61,7 @@ Os 5 temas (cada um em sua própria linha):
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.9, maxOutputTokens: 400 },
+        generationConfig: { temperature: 0.9, maxOutputTokens: 800 },
       }),
     });
   } catch {
@@ -79,17 +78,15 @@ Os 5 temas (cada um em sua própria linha):
 
   const texto = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
-  console.log("[sugerir-temas] resposta bruta:", JSON.stringify(texto));
-
-  const temas = texto
-    .split(/\n/)
-    .map((l: string) =>
-      l.replace(/^\s*[\d]+[.)]\s*/, "").replace(/^\s*[-*•]\s*/, "").replace(/\*\*/g, "").trim()
-    )
-    .filter((l: string) => l.length > 5)
-    .slice(0, 5);
-
-  console.log("[sugerir-temas] temas:", JSON.stringify(temas));
+  let temas: string[] = [];
+  try {
+    const parsed = JSON.parse(texto.trim());
+    if (Array.isArray(parsed)) {
+      temas = parsed.map((t: unknown) => String(t).trim()).filter((t) => t.length > 0).slice(0, 3);
+    }
+  } catch {
+    console.error("[sugerir-temas] parse falhou:", JSON.stringify(texto));
+  }
 
   if (temas.length === 0) {
     return erroJson(502, "Não conseguimos gerar sugestões. Tente novamente.");

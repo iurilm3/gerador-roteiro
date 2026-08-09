@@ -256,7 +256,7 @@ export default function GerarPage() {
       setErroSugestao(true);
       return;
     }
-    setSugestoes(data.temas);
+    setSugestoes((data.temas as string[]).slice(0, 3));
   }
 
   const pode_gerar =
