@@ -49,16 +49,10 @@ Nicho: ${perfil.nicho}
 Público: ${perfil.publico}
 Produto: ${perfil.produto}
 
-Cada sugestão deve ser um assunto diferente dos outros quatro — como se fossem temas para 5 dias distintos da semana. Varie entre: um problema que o público enfrenta, uma crença comum que merece ser questionada, um resultado ou transformação possível, e temas livres do nicho.
+Cada sugestão deve ser um assunto completamente diferente das outras — como se fossem temas para 5 dias distintos da semana. Varie entre: um problema que o público enfrenta, uma crença comum que merece ser questionada, um resultado ou transformação possível, e temas relevantes do nicho.
 
-Exemplo de formato correto (adapte ao nicho real, não copie):
-Como parar de trabalhar mais e ganhar menos
-O erro que faz freelancers perderem clientes bons
-Quanto tempo leva para ter renda previsível
-Por que diversificar serviços pode te prejudicar
-O que clientes de alto valor realmente buscam
-
-Agora gere as 5 sugestões para o nicho acima. Responda apenas com as 5 linhas, sem introdução, sem numeração, sem explicações.`;
+Responda APENAS com um array JSON válido contendo exatamente 5 strings. Sem texto antes, sem texto depois, sem markdown, sem bloco de código. Exemplo do formato esperado:
+["Tema um aqui", "Tema dois aqui", "Tema três aqui", "Tema quatro aqui", "Tema cinco aqui"]`;
 
   const geminiUrl =
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${geminiKey}`;
@@ -88,17 +82,22 @@ Agora gere as 5 sugestões para o nicho acima. Responda apenas com as 5 linhas, 
   const texto = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
   console.log("[sugerir-temas] resposta bruta:", JSON.stringify(texto));
 
-  const temas = texto
-    .split(/\n+/)
-    .map((l: string) =>
-      l
-        .replace(/^\s*[\d]+[.)]\s*/, "") // remove "1. " ou "1) "
-        .replace(/^\s*[-*•]\s*/, "")     // remove "- " ou "* "
-        .replace(/\*\*/g, "")            // remove markdown bold
-        .trim()
-    )
-    .filter((l: string) => l.length > 8) // descarta linhas muito curtas (intro/rodapé)
-    .slice(0, 5);
+  // Extrai o array JSON da resposta — remove possível markdown ```json ... ```
+  const jsonStr = texto.replace(/```json\s*/gi, "").replace(/```/g, "").trim();
+  let temas: string[] = [];
+  try {
+    const parsed = JSON.parse(jsonStr);
+    if (Array.isArray(parsed)) {
+      temas = parsed.map((t: unknown) => String(t).trim()).filter((t) => t.length > 0).slice(0, 5);
+    }
+  } catch {
+    // fallback: tenta parsear linha a linha se o JSON falhar
+    temas = texto
+      .split(/\n+/)
+      .map((l: string) => l.replace(/^\s*[\d]+[.)]\s*/, "").replace(/^\s*[-*•"]\s*/,"").replace(/"/g,"").trim())
+      .filter((l: string) => l.length > 8)
+      .slice(0, 5);
+  }
 
   console.log("[sugerir-temas] temas parseados:", JSON.stringify(temas));
 
