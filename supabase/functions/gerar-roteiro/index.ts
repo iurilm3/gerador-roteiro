@@ -165,7 +165,7 @@ SLIDE 8 — CTA: próximo passo claro, verbo no imperativo, objeto concreto.`,
 Entre 5 e 8 telas. Para cada tela, escreva "TELA X:" e forneça:
 - TEXTO: o que aparece escrito na tela (curto, direto, fonte grande)
 - VISUAL: sugestão de fundo, cor ou elemento visual (uma linha)
-- INTERAÇÃO: elemento interativo se aplicável (enquete, caixinha de pergunta, link) — opcional
+- INTERAÇÃO: veja instrução de interações abaixo
 
 Estruture entre 5 e 8 telas seguindo o arco SPIN Selling, nesta ordem obrigatória — nunca pule uma etapa, mas as etapas centrais podem ocupar mais de uma tela quando o argumento pedir mais desenvolvimento:
 
@@ -175,13 +175,29 @@ TELAS SEGUINTES — IMPLICAÇÃO (1 a 2 telas): aprofunda o que piora se o probl
 1 TELA — NECESSIDADE DE SOLUÇÃO: antes de apresentar qualquer produto ou mecanismo, faça o leitor articular o próprio desejo pela solução — o que mudaria se isso fosse resolvido.
 1 TELA — FECHAMENTO: apresenta o caminho e o CTA direto.
 
-O total nunca deve passar de 8 telas. A implicação e a necessidade são etapas psicológicas diferentes — não pule da dor direto pra explicação técnica da solução, mesmo expandindo o número de telas.` : `
-3 a 5 telas sequenciais. Para cada tela, escreva "TELA X:" e forneça:
+O total nunca deve passar de 8 telas. A implicação e a necessidade são etapas psicológicas diferentes — não pule da dor direto pra explicação técnica da solução, mesmo expandindo o número de telas.
+
+INTERAÇÕES: o campo de interação em cada tela é opcional, mas deve ser usado com intenção — não como decoração. O modelo escolhe livremente o tipo e o momento com base no objetivo, nicho e tom do stories. Use como referência:
+- Caixinha de pergunta ou enquete: ativa o leitor antes de entregar o argumento, cria autoridade ('Você já tentou X?'), ou serve de gancho pra automação (ManyChat, DM automático).
+- Link ou botão de swipe-up: pra levar pra página, checkout ou isca digital — usar na tela de fechamento/CTA, não no meio.
+- Figurinha de DM / 'Manda uma mensagem': quando o próximo passo for uma conversa (consultoria, qualificação, oferta personalizada).
+- Compartilhar: quando o conteúdo tiver alto valor de identificação e o objetivo for crescimento orgânico.
+- Nenhuma interação: quando a tela precisa da atenção inteira no texto, sem distração.
+O modelo nunca deve adicionar interação só por adicionar — cada uma deve ter uma razão clara no contexto daquela tela específica.` : `
+Entre 5 e 8 telas. Para cada tela, escreva "TELA X:" e forneça:
 - TEXTO: o que aparece escrito na tela (curto, direto, fonte grande)
 - VISUAL: sugestão de fundo, cor ou elemento visual (uma linha)
-- INTERAÇÃO: elemento interativo se aplicável (enquete, caixinha de pergunta, link) — opcional
+- INTERAÇÃO: veja instrução de interações abaixo
 
-Narrativa encadeada: cada tela depende da anterior para fazer sentido. Ritmo rápido.`,
+Narrativa encadeada: cada tela depende da anterior para fazer sentido. Ritmo rápido.
+
+INTERAÇÕES: o campo de interação em cada tela é opcional, mas deve ser usado com intenção — não como decoração. O modelo escolhe livremente o tipo e o momento com base no objetivo, nicho e tom do stories. Use como referência:
+- Caixinha de pergunta ou enquete: ativa o leitor antes de entregar o argumento, cria autoridade ('Você já tentou X?'), ou serve de gancho pra automação (ManyChat, DM automático).
+- Link ou botão de swipe-up: pra levar pra página, checkout ou isca digital — usar na tela de fechamento/CTA, não no meio.
+- Figurinha de DM / 'Manda uma mensagem': quando o próximo passo for uma conversa (consultoria, qualificação, oferta personalizada).
+- Compartilhar: quando o conteúdo tiver alto valor de identificação e o objetivo for crescimento orgânico.
+- Nenhuma interação: quando a tela precisa da atenção inteira no texto, sem distração.
+O modelo nunca deve adicionar interação só por adicionar — cada uma deve ter uma razão clara no contexto daquela tela específica.`,
   };
   return mapa[formato] ?? "Gere o conteúdo no formato solicitado, com estrutura clara e linguagem direta.";
 }
